@@ -308,7 +308,7 @@ const ficha = {
 // CONFIGURAÇÃO DO BACKEND
 // ==========================================
 
-const API_URL = "http://localhost:3000";
+const API_URL = "https://ficha-treino.onrender.com";
 
 
 // ==========================================
