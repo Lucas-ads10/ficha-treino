@@ -1,0 +1,825 @@
+/* ==========================================
+   RESET
+========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* ==========================================
+   BODY
+========================================== */
+
+body {
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #f4f4f5;
+
+    color: #18181b;
+
+    min-height: 100vh;
+
+}
+
+
+/* ==========================================
+   CONTAINER
+========================================== */
+
+.container {
+
+    width: 100%;
+
+    max-width: 800px;
+
+    margin: 0 auto;
+
+    padding: 0 20px;
+
+}
+
+
+/* ==========================================
+   CABEÇALHO
+========================================== */
+
+.cabecalho {
+
+    background: #18181b;
+
+    color: white;
+
+    padding: 28px 0;
+
+}
+
+
+.cabecalho h1 {
+
+    font-size: 26px;
+
+    font-weight: 700;
+
+    margin-bottom: 6px;
+
+}
+
+
+.cabecalho p {
+
+    color: #a1a1aa;
+
+    font-size: 14px;
+
+}
+
+
+/* ==========================================
+   CONTEÚDO PRINCIPAL
+========================================== */
+
+main {
+
+    padding-top: 28px;
+
+    padding-bottom: 50px;
+
+}
+
+
+/* ==========================================
+   ESCOLHA DO TREINO
+========================================== */
+
+.selecao-treino {
+
+    margin-bottom: 28px;
+
+}
+
+
+.selecao-treino h2 {
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: #52525b;
+
+    margin-bottom: 12px;
+
+}
+
+
+/* ==========================================
+   BOTÕES A B C D E
+========================================== */
+
+.botoes-treino {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 8px;
+
+}
+
+
+.botao-treino {
+
+    height: 52px;
+
+    border: 1px solid #d4d4d8;
+
+    border-radius: 10px;
+
+    background: white;
+
+    color: #3f3f46;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease;
+
+}
+
+
+.botao-treino:hover {
+
+    background: #fafafa;
+
+    border-color: #a1a1aa;
+
+}
+
+
+.botao-treino.ativo {
+
+    background: #18181b;
+
+    color: white;
+
+    border-color: #18181b;
+
+}
+
+
+/* ==========================================
+   TÍTULO DO TREINO
+========================================== */
+
+.titulo-treino {
+
+    margin-bottom: 16px;
+
+}
+
+
+.titulo-treino h2 {
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    margin-bottom: 4px;
+
+}
+
+
+.titulo-treino p {
+
+    color: #71717a;
+
+    font-size: 14px;
+
+}
+
+
+/* ==========================================
+   LISTA DE EXERCÍCIOS
+========================================== */
+
+#listaExercicios {
+
+    width: 100%;
+
+}
+
+
+/* ==========================================
+   ITEM DO EXERCÍCIO
+========================================== */
+
+.item-exercicio {
+
+    width: 100%;
+
+    background: white;
+
+    border: 1px solid #e4e4e7;
+
+    border-radius: 12px;
+
+    padding: 17px 18px;
+
+    margin-bottom: 9px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.12s ease,
+        border-color 0.12s ease,
+        box-shadow 0.12s ease;
+
+}
+
+
+.item-exercicio:hover {
+
+    border-color: #c4c4c8;
+
+    box-shadow:
+        0 3px 10px
+        rgba(0, 0, 0, 0.05);
+
+    transform: translateY(-1px);
+
+}
+
+
+.item-exercicio:active {
+
+    transform: scale(0.99);
+
+}
+
+
+/* ==========================================
+   INFORMAÇÕES DO EXERCÍCIO
+========================================== */
+
+.info-item {
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+}
+
+
+.info-item strong {
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: #18181b;
+
+    line-height: 1.3;
+
+}
+
+
+.info-item span {
+
+    font-size: 13px;
+
+    color: #71717a;
+
+}
+
+
+.info-item small {
+
+    font-size: 12px;
+
+    color: #a1a1aa;
+
+    margin-top: 2px;
+
+}
+
+
+/* ==========================================
+   SETA
+========================================== */
+
+.seta {
+
+    flex-shrink: 0;
+
+    width: 28px;
+
+    height: 28px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #a1a1aa;
+
+    font-size: 26px;
+
+    font-weight: 300;
+
+}
+
+
+/* ==========================================
+   DETALHES DO EXERCÍCIO
+========================================== */
+
+.exercicio-detalhes {
+
+    width: 100%;
+
+    background: white;
+
+    border: 1px solid #e4e4e7;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+}
+
+
+/* ==========================================
+   BOTÃO VOLTAR
+========================================== */
+
+.botao-voltar {
+
+    border: none;
+
+    background: transparent;
+
+    color: #52525b;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    padding: 0;
+
+    margin-bottom: 22px;
+
+    cursor: pointer;
+
+}
+
+
+.botao-voltar:hover {
+
+    color: #18181b;
+
+}
+
+
+/* ==========================================
+   ÚLTIMO TREINO
+========================================== */
+
+.ultimo-detalhes {
+
+    background: #f4f4f5;
+
+    border-radius: 10px;
+
+    padding: 16px;
+
+    margin-bottom: 24px;
+
+}
+
+
+.ultimo-detalhes h3 {
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    margin-bottom: 12px;
+
+}
+
+
+/* ==========================================
+   DATA DO ÚLTIMO TREINO
+========================================== */
+
+.data-ultimo-treino {
+
+    font-size: 13px;
+
+    color: #52525b;
+
+    background: white;
+
+    border: 1px solid #e4e4e7;
+
+    border-radius: 7px;
+
+    padding: 9px 10px;
+
+    margin-bottom: 10px;
+
+}
+
+
+/* ==========================================
+   LINHA DO ÚLTIMO TREINO
+========================================== */
+
+.linha-ultimo {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 10px 0;
+
+    border-bottom: 1px solid #e4e4e7;
+
+    font-size: 13px;
+
+}
+
+
+.linha-ultimo:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.linha-ultimo span {
+
+    color: #71717a;
+
+}
+
+
+.linha-ultimo strong {
+
+    font-size: 14px;
+
+    color: #27272a;
+
+}
+
+
+/* ==========================================
+   SEM DADOS
+========================================== */
+
+.sem-dados {
+
+    color: #71717a;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+}
+
+
+/* ==========================================
+   TREINO ATUAL
+========================================== */
+
+.treino-atual-detalhes {
+
+    padding-top: 4px;
+
+}
+
+
+.treino-atual-detalhes h3 {
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    margin-bottom: 12px;
+
+}
+
+
+/* ==========================================
+   LINHA DAS SÉRIES
+========================================== */
+
+.linha-atual {
+
+    display: grid;
+
+    grid-template-columns:
+        75px
+        1fr
+        1fr;
+
+    gap: 10px;
+
+    align-items: center;
+
+    padding: 10px;
+
+    background: #fafafa;
+
+    border: 1px solid #e4e4e7;
+
+    border-radius: 8px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.linha-atual strong {
+
+    font-size: 13px;
+
+    color: #52525b;
+
+}
+
+
+/* ==========================================
+   INPUTS
+========================================== */
+
+.linha-atual input,
+.campo-grande input {
+
+    width: 100%;
+
+    height: 42px;
+
+    padding: 0 11px;
+
+    border: 1px solid #d4d4d8;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #18181b;
+
+    font-size: 14px;
+
+    outline: none;
+
+}
+
+
+.linha-atual input:focus,
+.campo-grande input:focus {
+
+    border-color: #71717a;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(0, 0, 0, 0.05);
+
+}
+
+
+.linha-atual input::placeholder,
+.campo-grande input::placeholder {
+
+    color: #a1a1aa;
+
+}
+
+
+/* ==========================================
+   CAMPO GRANDE
+========================================== */
+
+.campo-grande {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.campo-grande label {
+
+    font-size: 13px;
+
+    color: #52525b;
+
+}
+
+
+/* ==========================================
+   BOTÃO SALVAR
+========================================== */
+
+.botao-salvar-detalhes {
+
+    width: 100%;
+
+    height: 46px;
+
+    margin-top: 10px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #18181b;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        transform 0.1s ease;
+
+}
+
+
+.botao-salvar-detalhes:hover {
+
+    background: #27272a;
+
+}
+
+
+.botao-salvar-detalhes:active {
+
+    transform: scale(0.99);
+
+}
+
+
+/* ==========================================
+   CELULAR
+========================================== */
+
+@media (max-width: 600px) {
+
+    .container {
+
+        padding: 0 14px;
+
+    }
+
+
+    .cabecalho {
+
+        padding: 22px 0;
+
+    }
+
+
+    .cabecalho h1 {
+
+        font-size: 22px;
+
+    }
+
+
+    main {
+
+        padding-top: 22px;
+
+    }
+
+
+    .titulo-treino h2 {
+
+        font-size: 22px;
+
+    }
+
+
+    .botoes-treino {
+
+        gap: 6px;
+
+    }
+
+
+    .botao-treino {
+
+        height: 48px;
+
+        border-radius: 8px;
+
+    }
+
+
+    .item-exercicio {
+
+        padding: 15px;
+
+        border-radius: 10px;
+
+    }
+
+
+    .info-item strong {
+
+        font-size: 15px;
+
+    }
+
+
+    .info-item span {
+
+        font-size: 12px;
+
+    }
+
+
+    .info-item small {
+
+        font-size: 11px;
+
+    }
+
+
+    .exercicio-detalhes {
+
+        padding: 16px;
+
+    }
+
+
+    .linha-atual {
+
+        grid-template-columns:
+            1fr 1fr;
+
+        gap: 8px;
+
+    }
+
+
+    .linha-atual strong {
+
+        grid-column: 1 / -1;
+
+        padding-bottom: 2px;
+
+    }
+
+
+    .linha-ultimo {
+
+        gap: 10px;
+
+    }
+
+
+    .linha-ultimo strong {
+
+        text-align: right;
+
+    }
+
+}
