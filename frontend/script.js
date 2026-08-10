@@ -15,52 +15,47 @@ const ficha = {
         exercicios: [
 
             {
-                nome: "Remada aberta",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Remada cavalinho",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Crucifixo inverso halter sentado",
+                nome: "Cadeira adutora (isometria em alongamento)",
                 series: 3,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Leg press 45°",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Cadeira extensora",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Pallof press (isométrico)",
-                series: 4,
-                repeticoes: "30 segundos cada lado",
+                repeticoes: "25 segundos",
                 tipo: "tempo"
             },
 
             {
-                nome: "Panturrilha em pé",
+                nome: "Búlgaro",
+                series: 3,
+                repeticoes: "12 a 15 cada lado"
+            },
+
+            {
+                nome: "Cadeira flexora",
                 series: 4,
-                repeticoes: "15 a 20"
+                repeticoes: "10 a 12"
+            },
+
+            {
+                nome: "Supino reto barra",
+                series: 4,
+                repeticoes: "2x 12 a 15 preparatórias + 2x 6 a 8 válidas (força)"
+            },
+
+            {
+                nome: "Desenvolvimento militar",
+                series: 4,
+                repeticoes: "2x 12 a 15 preparatórias + 2x 6 a 8 válidas (força)"
+            },
+
+            {
+                nome: "Pallof press",
+                series: 3,
+                repeticoes: "45 segundos cada lado",
+                tipo: "tempo"
             },
 
             {
                 nome: "Cardio bike ou esteira",
                 series: 1,
-                repeticoes: "10 a 20 minutos",
+                repeticoes: "20 a 30 minutos",
                 tipo: "cardio"
             }
 
@@ -80,21 +75,15 @@ const ficha = {
         exercicios: [
 
             {
-                nome: "Supino inclinado",
+                nome: "Leg press",
                 series: 4,
-                repeticoes: "12 a 15"
+                repeticoes: "2x 12 a 15 preparatórias + 2x 6 a 8 válidas (força)"
             },
 
             {
-                nome: "Crucifixo reto",
-                series: 4,
-                repeticoes: "10 a 12"
-            },
-
-            {
-                nome: "Pull over",
+                nome: "Passada afundo",
                 series: 3,
-                repeticoes: "12 a 15"
+                repeticoes: "24 a 30 passos"
             },
 
             {
@@ -104,21 +93,27 @@ const ficha = {
             },
 
             {
-                nome: "Levantamento terra",
+                nome: "Remada curvada",
                 series: 4,
-                repeticoes: "10 a 12"
+                repeticoes: "2x 12 a 15 preparatórias + 2x 6 a 8 válidas (força)"
             },
 
             {
-                nome: "Oblíquo unilateral",
+                nome: "Puxada supinada",
                 series: 4,
-                repeticoes: "12 cada lado"
+                repeticoes: "20 a 24"
+            },
+
+            {
+                nome: "Deadbug elastico",
+                series: 3,
+                repeticoes: "15 cada lado"
             },
 
             {
                 nome: "Cardio bike ou esteira",
                 series: 1,
-                repeticoes: "10 a 20 minutos",
+                repeticoes: "20 a 30 minutos",
                 tipo: "cardio"
             }
 
@@ -138,46 +133,47 @@ const ficha = {
         exercicios: [
 
             {
-                nome: "Desenvolvimento",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Elevação lateral",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Tríceps corda",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Rosca francesa na polia",
-                series: 4,
-                repeticoes: "10 a 12"
-            },
-
-            {
-                nome: "Mesa flexora",
-                series: 4,
-                repeticoes: "10 a 12"
-            },
-
-            {
-                nome: "Cadeira adutora",
+                nome: "Cadeira adutora (isometria em alongamento)",
                 series: 3,
-                repeticoes: "12 a 15 cada lado"
+                repeticoes: "25 segundos",
+                tipo: "tempo"
             },
 
             {
-                nome: "Cardio bike ou esteira",
-                series: 1,
-                repeticoes: "10 a 20 minutos",
-                tipo: "cardio"
+                nome: "Elevação pélvica",
+                series: 4,
+                repeticoes: "2x 12 a 15 preparatórias + 2x 6 a 8 válidas (força)"
+            },
+
+            {
+                nome: "Levantamento terra",
+                series: 4,
+                repeticoes: "2x 12 a 15 preparatórias + 2x 6 a 8 válidas (força)"
+            },
+
+            {
+                nome: "Hang clean and jerk",
+                series: 3,
+                repeticoes: "15 a 18"
+            },
+
+            {
+                nome: "Rosca direta",
+                series: 4,
+                repeticoes: "12 a 15"
+            },
+
+            {
+                nome: "Triceps frances polia",
+                series: 4,
+                repeticoes: "12 a 15"
+            },
+
+            {
+                nome: "Prancha",
+                series: 4,
+                repeticoes: "60 a 90 segundos",
+                tipo: "tempo"
             }
 
         ]
@@ -196,104 +192,45 @@ const ficha = {
         exercicios: [
 
             {
-                nome: "Agachamento",
+                nome: "Agachamento zercher",
                 series: 4,
-                repeticoes: "12 a 15"
+                repeticoes: "2x 12 a 15 preparatórias + 2x 6 a 8 válidas (força)"
             },
 
             {
-                nome: "Extensora unilateral",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Rosca direta banco inclinado",
+                nome: "Mesa flexora",
                 series: 4,
                 repeticoes: "10 a 12"
             },
 
             {
-                nome: "Rosca martelo alternando",
+                nome: "Supino reto halteres",
                 series: 4,
-                repeticoes: "20 a 24"
+                repeticoes: "2x 12 a 15 preparatórias + 2x 6 a 8 válidas (força)"
             },
 
             {
-                nome: "Panturrilha unilateral",
+                nome: "Push press halteres",
                 series: 3,
-                repeticoes: "12 cada lado"
+                repeticoes: "18 a 20"
             },
 
             {
-                nome: "Prancha frontal",
+                nome: "Apoio Flexoes com carga",
                 series: 4,
-                repeticoes: "60 segundos",
-                tipo: "tempo"
+                repeticoes: "Até a falha"
+            },
+
+            {
+                nome: "Bird dog em posição de prancha alta",
+                series: 3,
+                repeticoes: "10 cada lado"
             },
 
             {
                 nome: "Cardio bike ou esteira",
                 series: 1,
-                repeticoes: "10 a 20 minutos",
-                tipo: "cardio"
-            }
-
-        ]
-
-    },
-
-
-    // ======================================
-    // TREINO E
-    // ======================================
-
-    E: {
-
-        nome: "Treino E",
-
-        exercicios: [
-
-            {
-                nome: "Puxada aberta",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Puxada neutra",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Crucifixo polia alta",
-                series: 4,
-                repeticoes: "10 a 12"
-            },
-
-            {
-                nome: "Elevação lateral",
-                series: 3,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Facepull",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Encolhimento com barra por trás",
-                series: 4,
-                repeticoes: "12 a 15"
-            },
-
-            {
-                nome: "Cardio bike ou esteira",
-                series: 1,
-                repeticoes: "10 a 20 minutos",
+                repeticoes: "20 a 30 minutos",
                 tipo: "cardio"
             }
 
@@ -308,6 +245,10 @@ const ficha = {
 // CONFIGURAÇÃO DO BACKEND
 // ==========================================
 
+// Se estiver testando o server.js LOCALMENTE:
+// const API_URL = "http://localhost:3000";
+
+// Se estiver usando o backend publicado no Render:
 const API_URL = "https://ficha-treino.onrender.com";
 
 
@@ -319,8 +260,6 @@ let treinoSelecionado = "A";
 
 let exercicioSelecionado = null;
 
-
-// Guarda o último treino carregado do MySQL
 let ultimoTreinoAtual = null;
 
 
@@ -329,73 +268,49 @@ let ultimoTreinoAtual = null;
 // ==========================================
 
 const botoesTreino =
-    document.querySelectorAll(
-        ".botao-treino"
-    );
-
+    document.querySelectorAll(".botao-treino");
 
 const listaExercicios =
-    document.getElementById(
-        "listaExercicios"
-    );
-
+    document.getElementById("listaExercicios");
 
 const tituloTreino =
-    document.getElementById(
-        "tituloTreino"
-    );
-
+    document.getElementById("tituloTreino");
 
 const descricaoTreino =
-    document.getElementById(
-        "descricaoTreino"
-    );
+    document.getElementById("descricaoTreino");
 
 
 // ==========================================
-// BOTÕES A, B, C, D, E
+// BOTÕES A, B, C, D
 // ==========================================
 
-botoesTreino.forEach(
-    function (botao) {
+botoesTreino.forEach(function (botao) {
 
-        botao.addEventListener(
-            "click",
-            function () {
+    botao.addEventListener("click", function () {
 
-                treinoSelecionado =
-                    botao.dataset.treino;
+        treinoSelecionado =
+            botao.dataset.treino;
 
-                exercicioSelecionado =
-                    null;
+        exercicioSelecionado = null;
 
-                ultimoTreinoAtual =
-                    null;
+        ultimoTreinoAtual = null;
 
 
-                botoesTreino.forEach(
-                    function (botaoAtual) {
+        botoesTreino.forEach(function (botaoAtual) {
 
-                        botaoAtual.classList.remove(
-                            "ativo"
-                        );
+            botaoAtual.classList.remove("ativo");
 
-                    }
-                );
+        });
 
 
-                botao.classList.add(
-                    "ativo"
-                );
+        botao.classList.add("ativo");
 
 
-                mostrarListaExercicios();
+        mostrarListaExercicios();
 
-            }
-        );
+    });
 
-    }
-);
+});
 
 
 // ==========================================
@@ -422,9 +337,7 @@ function formatarData(data) {
     }
 
 
-    return dataObj.toLocaleDateString(
-        "pt-BR"
-    );
+    return dataObj.toLocaleDateString("pt-BR");
 
 }
 
@@ -463,9 +376,7 @@ async function buscarUltimoTreino(
             await resposta.json();
 
 
-        if (
-            !dados.sucesso
-        ) {
+        if (!dados.sucesso) {
 
             throw new Error(
                 dados.mensagem ||
@@ -509,9 +420,19 @@ async function buscarUltimoTreino(
 async function mostrarListaExercicios() {
 
     const treino =
-        ficha[
+        ficha[treinoSelecionado];
+
+
+    if (!treino) {
+
+        console.error(
+            "Treino não encontrado:",
             treinoSelecionado
-        ];
+        );
+
+        return;
+
+    }
 
 
     tituloTreino.textContent =
@@ -564,6 +485,7 @@ async function mostrarListaExercicios() {
                     };
 
                 }
+
             )
 
         );
@@ -602,11 +524,12 @@ async function mostrarListaExercicios() {
                 dados.series.length > 0
             ) {
 
-                // EXERCÍCIO NORMAL
 
-                if (
-                    !exercicio.tipo
-                ) {
+                // ==================================
+                // EXERCÍCIO NORMAL
+                // ==================================
+
+                if (!exercicio.tipo) {
 
                     const primeiraSerie =
                         dados.series[0];
@@ -619,7 +542,9 @@ async function mostrarListaExercicios() {
                 }
 
 
+                // ==================================
                 // EXERCÍCIO DE TEMPO
+                // ==================================
 
                 else if (
                     exercicio.tipo === "tempo"
@@ -635,7 +560,9 @@ async function mostrarListaExercicios() {
                 }
 
 
+                // ==================================
                 // CARDIO
+                // ==================================
 
                 else if (
                     exercicio.tipo === "cardio"
@@ -651,15 +578,17 @@ async function mostrarListaExercicios() {
                 }
 
 
+                // ==================================
                 // DATA
+                // ==================================
 
-                if (
-                    dados.data_treino
-                ) {
+                if (dados.data_treino) {
 
                     dataUltimo =
                         `📅 Último treino: ` +
-                        `${formatarData(dados.data_treino)}`;
+                        `${formatarData(
+                            dados.data_treino
+                        )}`;
 
                 }
 
@@ -671,9 +600,7 @@ async function mostrarListaExercicios() {
             // ==================================
 
             const item =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
 
             item.classList.add(
@@ -724,19 +651,16 @@ async function mostrarListaExercicios() {
                 "click",
                 function () {
 
-                    abrirExercicio(
-                        index
-                    );
+                    abrirExercicio(index);
 
                 }
             );
 
 
-            listaExercicios.appendChild(
-                item
-            );
+            listaExercicios.appendChild(item);
 
         }
+
     );
 
 }
@@ -832,9 +756,7 @@ function mostrarExercicio(
 
 
     const card =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     card.classList.add(
@@ -904,18 +826,20 @@ function mostrarExercicio(
 
     else {
 
+        // ==================================
         // DATA
+        // ==================================
 
-        if (
-            dados.data_treino
-        ) {
+        if (dados.data_treino) {
 
             html += `
 
                 <div class="data-ultimo-treino">
 
                     📅 Realizado em
-                    ${formatarData(dados.data_treino)}
+                    ${formatarData(
+                        dados.data_treino
+                    )}
 
                 </div>
 
@@ -928,9 +852,7 @@ function mostrarExercicio(
         // EXERCÍCIO NORMAL
         // ==================================
 
-        if (
-            !exercicio.tipo
-        ) {
+        if (!exercicio.tipo) {
 
             dados.series.forEach(
                 function (serie, i) {
@@ -1107,6 +1029,7 @@ function mostrarExercicio(
                         data-serie="${i}"
                         placeholder="Segundos"
                         min="1"
+                        step="1"
                     >
 
                 </div>
@@ -1196,9 +1119,7 @@ function mostrarExercicio(
     // ======================================
 
     document
-        .getElementById(
-            "voltarLista"
-        )
+        .getElementById("voltarLista")
         .addEventListener(
             "click",
             function () {
@@ -1220,9 +1141,7 @@ function mostrarExercicio(
     // ======================================
 
     document
-        .getElementById(
-            "salvarExercicio"
-        )
+        .getElementById("salvarExercicio")
         .addEventListener(
             "click",
             function () {
@@ -1269,6 +1188,10 @@ async function salvarExercicio(
 
     try {
 
+        // ==================================
+        // DADOS BÁSICOS
+        // ==================================
+
         let dadosEnviar = {
 
             treino:
@@ -1298,10 +1221,17 @@ async function salvarExercicio(
                 );
 
 
-            const valor =
-                Number(
-                    campo.value
+            if (!campo) {
+
+                throw new Error(
+                    "Campo do cardio não encontrado."
                 );
+
+            }
+
+
+            const valor =
+                Number(campo.value);
 
 
             if (
@@ -1318,6 +1248,10 @@ async function salvarExercicio(
             }
 
 
+            // IMPORTANTE:
+            // O server.js espera "valor"
+            // diretamente no objeto.
+
             dadosEnviar.valor =
                 valor;
 
@@ -1325,7 +1259,7 @@ async function salvarExercicio(
 
 
         // ==================================
-        // TEMPO
+        // EXERCÍCIO DE TEMPO
         // ==================================
 
         else if (
@@ -1336,6 +1270,18 @@ async function salvarExercicio(
                 document.querySelectorAll(
                     ".tempo-atual"
                 );
+
+
+            if (
+                campos.length !==
+                exercicio.series
+            ) {
+
+                throw new Error(
+                    "Quantidade de campos de tempo inválida."
+                );
+
+            }
 
 
             const series = [];
@@ -1366,6 +1312,10 @@ async function salvarExercicio(
 
                 }
 
+
+                // IMPORTANTE:
+                // O server.js espera "valor"
+                // e não "valor_tempo".
 
                 series.push({
 
@@ -1401,6 +1351,20 @@ async function salvarExercicio(
                 );
 
 
+            if (
+                cargas.length !==
+                exercicio.series ||
+                reps.length !==
+                exercicio.series
+            ) {
+
+                throw new Error(
+                    "Quantidade de campos inválida."
+                );
+
+            }
+
+
             const series = [];
 
 
@@ -1423,7 +1387,6 @@ async function salvarExercicio(
 
 
                 if (
-                    !carga ||
                     carga <= 0 ||
                     !repeticoes ||
                     repeticoes <= 0
@@ -1458,7 +1421,17 @@ async function salvarExercicio(
 
 
         // ==================================
-        // ENVIAR PARA O NODE.JS
+        // MOSTRAR O QUE SERÁ ENVIADO
+        // ==================================
+
+        console.log(
+            "Dados enviados para o servidor:",
+            dadosEnviar
+        );
+
+
+        // ==================================
+        // ENVIAR PARA NODE.JS
         // ==================================
 
         const resposta =
@@ -1487,8 +1460,25 @@ async function salvarExercicio(
             );
 
 
-        const resultado =
-            await resposta.json();
+        // ==================================
+        // LER RESPOSTA
+        // ==================================
+
+        let resultado;
+
+
+        try {
+
+            resultado =
+                await resposta.json();
+
+        } catch (erroJson) {
+
+            throw new Error(
+                "O servidor não retornou uma resposta válida."
+            );
+
+        }
 
 
         // ==================================
@@ -1515,6 +1505,7 @@ async function salvarExercicio(
         // ==================================
 
         alert(
+            resultado.mensagem ||
             "Exercício salvo no MySQL! 💪"
         );
 
@@ -1527,7 +1518,10 @@ async function salvarExercicio(
             null;
 
 
-        // Atualizar a lista
+        // ==================================
+        // ATUALIZAR LISTA
+        // ==================================
+
         await mostrarListaExercicios();
 
 
@@ -1542,11 +1536,10 @@ async function salvarExercicio(
         alert(
 
             "Não foi possível salvar o treino.\n\n" +
-            "Verifique se o servidor Node.js está rodando.\n\n" +
+            "Verifique se o servidor Node.js está online.\n\n" +
             erro.message
 
         );
-
 
     } finally {
 
@@ -1570,3 +1563,4 @@ async function salvarExercicio(
 // ==========================================
 
 mostrarListaExercicios();
+

@@ -160,7 +160,12 @@ app.post("/treinos", async (req, res) => {
 
         if (tipo === "cardio") {
 
-            if (!valor || Number(valor) <= 0) {
+            const tempoCardio =
+            Number(
+            valor_tempo ?? valor
+        );
+
+        if (!tempoCardio || tempoCardio <= 0) {
 
                 return res.status(400).json({
 
@@ -199,7 +204,7 @@ app.post("/treinos", async (req, res) => {
 
                     null,
 
-                    Number(valor),
+                    tempoCardio,
 
                     dataTreino
 
@@ -252,7 +257,9 @@ app.post("/treinos", async (req, res) => {
                 const serie = series[i];
 
                 const valorTempo =
-                    Number(serie.valor);
+                    Number(
+                serie.valor_tempo ?? serie.valor
+    );
 
 
                 if (valorTempo <= 0) {
