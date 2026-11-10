@@ -249,7 +249,7 @@ const ficha = {
 // const API_URL = "http://localhost:3000";
 
 // Se estiver usando o backend publicado no Render:
-const API_URL = "https://ficha-treino.onrender.com";
+const API_URL = "https://ficha-treino-nestjs.onrender.com";
 
 
 // ==========================================
