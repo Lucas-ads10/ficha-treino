@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Painel Administrativo | FitManager</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <!-- MENU LATERAL -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <img src="logo-caverna.jpeg" alt="Caverna Centro de Treinamento">
+            </div>
+
+
+            <nav class="menu">
+                <span class="menu-titulo">MENU PRINCIPAL</span>
+
+                <a href="#" class="menu-item ativo" data-view="dashboard">
+                    <span>▦</span>
+                    Dashboard
+                </a>
+
+                <a href="#" class="menu-item" data-view="usuarios">
+                    <span>👥</span>
+                    Usuários
+                </a>
+
+                <a href="#" class="menu-item" data-view="fichas">
+                    <span>📋</span>
+                    Fichas de treino
+                </a>
+
+                <a href="#" class="menu-item" data-view="pagamentos">
+                    <span>💰</span>
+                    Pagamentos
+                </a>
+            </nav>
+
+
+            <div class="sidebar-footer">
+                <div class="admin-avatar">A</div>
+                <div>
+                    <strong>Administrador</strong>
+                    <span>Administrador geral</span>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- CONTEÚDO -->
+        <main class="conteudo">
+
+            <header class="topbar">
+                <div>
+                    <h1 id="tituloPagina">Dashboard</h1>
+                    <p id="descricaoPagina">
+                        Bem-vindo ao painel administrativo.
+                    </p>
+                </div>
+
+                <div class="perfil-admin">
+                    <span class="status-online"></span>
+                    Administrador
+                </div>
+            </header>
+
+            <!-- DASHBOARD -->
+            <section id="viewDashboard" class="view">
+
+                <section class="indicadores">
+
+                    <article class="card-indicador">
+                        <div class="indicador-icone azul">👥</div>
+                        <div>
+                            <span>Total de usuários</span>
+                            <strong id="totalUsuarios">0</strong>
+                        </div>
+                    </article>
+
+                    <article class="card-indicador">
+                        <div class="indicador-icone verde">📋</div>
+                        <div>
+                            <span>Fichas cadastradas</span>
+                            <strong id="totalFichas">0</strong>
+                        </div>
+                    </article>
+
+                    <article class="card-indicador">
+                        <div class="indicador-icone laranja">💪</div>
+                        <div>
+                            <span>Exercícios cadastrados</span>
+                            <strong id="totalExercicios">0</strong>
+                        </div>
+                    </article>
+
+                </section>
+
+                <section class="secao-usuarios">
+                    <div class="secao-cabecalho">
+                        <div>
+                            <h2>Usuários recentes</h2>
+                            <p>Consulte os usuários cadastrados.</p>
+                        </div>
+
+                        <input type="text" id="pesquisaDashboard" placeholder="Pesquisar usuário pelo nome...">
+                    </div>
+
+                    <div class="tabela-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>USUÁRIO</th>
+                                    <th>E-MAIL</th>
+                                    <th>PESO</th>
+                                    <th>IDADE</th>
+                                    <th>OBJETIVO</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="listaUsuariosDashboard"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </section>
+
+            <!-- LISTA DE USUÁRIOS -->
+            <section id="viewUsuarios" class="view" hidden>
+
+                <section class="secao-usuarios">
+
+                    <div class="secao-cabecalho">
+                        <div>
+                            <h2>Todos os usuários</h2>
+                            <p>Gerencie as pessoas cadastradas.</p>
+                        </div>
+
+                        <div>
+                            <input type="text" id="pesquisaUsuarios" placeholder="Pesquisar usuário pelo nome...">
+
+                            <button class="botao-principal" id="btnNovoUsuarioLista">
+                                + Novo usuário
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="tabela-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>USUÁRIO</th>
+                                    <th>E-MAIL</th>
+                                    <th>PESO</th>
+                                    <th>IDADE</th>
+                                    <th>OBJETIVO</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="listaUsuariosCompleta"></tbody>
+                        </table>
+                    </div>
+
+                </section>
+
+            </section>
+
+            <!-- FICHAS -->
+            <section id="viewFichas" class="view" hidden>
+
+                <section class="secao-usuarios">
+                    <div class="secao-cabecalho">
+                        <div>
+                            <h2>Fichas de treino</h2>
+                            <p>Selecione um usuário para administrar seus treinos.</p>
+                        </div>
+
+                        <input type="text" id="pesquisaFichas" placeholder="Pesquisar usuário pelo nome...">
+                    </div>
+
+                    <div class="tabela-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>USUÁRIO</th>
+                                    <th>E-MAIL</th>
+                                    <th>FICHAS</th>
+                                    <th>AÇÃO</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="listaUsuariosFichas"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </section>
+
+            </section>
+
+            <!-- PAGAMENTOS -->
+            <section id="viewPagamentos" class="view" hidden>
+
+                <div class="secao-cabecalho">
+                    <div>
+                        <h2>Pagamentos</h2>
+                        <p>Acompanhe as mensalidades e a situação financeira dos clientes.</p>
+                    </div>
+                </div>
+
+                <!-- INDICADORES FINANCEIROS -->
+                <div class="indicadores">
+
+                    <div class="indicador">
+                        <span>Total recebido</span>
+                        <h2 id="totalRecebido">R$ 0,00</h2>
+                    </div>
+
+                    <div class="indicador">
+                        <span>Receita prevista</span>
+                        <h2 id="receitaPrevista">R$ 0,00</h2>
+                    </div>
+
+                    <div class="indicador">
+                        <span>Clientes em dia</span>
+                        <h2 id="clientesEmDia">0</h2>
+                    </div>
+
+                    <div class="indicador">
+                        <span>Clientes atrasados</span>
+                        <h2 id="clientesAtrasados">0</h2>
+                    </div>
+
+                </div>
+
+                <!-- GRÁFICO E SITUAÇÃO -->
+                <div class="secao-usuarios">
+
+                    <div class="secao-cabecalho">
+                        <div>
+                            <h3>Situação dos pagamentos</h3>
+                            <p>Distribuição dos clientes em dia e atrasados.</p>
+                        </div>
+                    </div>
+
+                    <div id="graficoPagamentos"></div>
+
+                </div>
+
+                <!-- LISTA DE PAGAMENTOS -->
+                <div class="secao-usuarios">
+
+                    <div class="secao-cabecalho">
+                        <div>
+                            <h3>Mensalidades dos clientes</h3>
+                            <p>Consulte vencimentos e registre novos pagamentos.</p>
+                        </div>
+                    </div>
+
+                    <div class="tabela-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Mensalidade</th>
+                                    <th>Último pagamento</th>
+                                    <th>Próximo vencimento</th>
+                                    <th>Situação</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="listaPagamentos"></tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- PERFIL DO USUÁRIO -->
+
+            <section id="viewPerfil" class="view" hidden>
+
+                <button class="botao-voltar" id="btnVoltarUsuarios">
+                    ← Voltar
+                </button>
+
+                <section class="secao-usuarios perfil-usuario">
+
+                    <div class="perfil-cabecalho">
+
+                        <div class="usuario-avatar perfil-avatar" id="perfilAvatar">
+                            U
+                        </div>
+
+                        <div>
+                            <h2 id="perfilNome">Nome do usuário</h2>
+                            <p id="perfilEmail">email@email.com</p>
+                            <span id="perfilStatus" class="status ativo">Ativo</span>
+                        </div>
+
+                    </div>
+
+                    <div class="botoes-formulario perfil-acoes">
+
+                        <button type="button" id="btnEditarUsuario" class="botao-principal">
+                            Editar usuário
+                        </button>
+
+                        <button type="button" id="btnBloquearUsuario">
+                            Bloquear usuário
+                        </button>
+
+                        <button type="button" id="btnExcluirUsuario">
+                            Excluir usuário
+                        </button>
+
+                    </div>
+
+                    <section class="dados-perfil">
+
+                        <h2>Dados do aluno</h2>
+
+                        <div class="dados-perfil-grid">
+
+                            <div>
+                                <strong>Peso</strong>
+                                <p id="perfilPeso">—</p>
+                            </div>
+
+                            <div>
+                                <strong>Idade</strong>
+                                <p id="perfilIdade">—</p>
+                            </div>
+
+                            <div>
+                                <strong>Objetivo</strong>
+                                <p id="perfilObjetivo">—</p>
+                            </div>
+
+                        </div>
+
+                        <div class="perfil-observacoes">
+                            <strong>Observações</strong>
+                            <p id="perfilObservacoes">Nenhuma observação cadastrada.</p>
+                        </div>
+
+                    </section>
+
+                    <div class="secao-cabecalho fichas-cabecalho">
+
+                        <div>
+                            <h2>Fichas de treino</h2>
+                            <p>Treinos atribuídos a este usuário.</p>
+                        </div>
+
+                        <button class="botao-principal" id="btnAdicionarTreino">
+                            + Adicionar treino
+                        </button>
+
+                    </div>
+
+                    <div id="listaTreinosUsuario" class="lista-treinos">
+                        <p class="mensagem-vazia">
+                            Este usuário ainda não possui treinos.
+                        </p>
+                    </div>
+
+                </section>
+
+            </section>
+
+
+
+            <!-- TELA DE GERENCIAMENTO DE EXERCÍCIOS -->
+            <section id="viewExercicios" class="view" hidden>
+
+                <button class="botao-voltar" id="btnVoltarTreinos">
+                    ← Voltar para os treinos
+                </button>
+
+                <section class="secao-usuarios">
+
+                    <div class="secao-cabecalho">
+                        <div>
+                            <h2 id="tituloTreinoSelecionado">Nome do treino</h2>
+                            <p id="descricaoTreinoSelecionado">
+                                Gerencie os exercícios deste treino.
+                            </p>
+                        </div>
+
+                        <button class="botao-principal" id="btnAdicionarExercicio">
+                            + Adicionar exercício
+                        </button>
+                    </div>
+
+                    <div id="listaExerciciosTreino" class="lista-treinos">
+                        <p class="mensagem-vazia">
+                            Este treino ainda não possui exercícios.
+                        </p>
+                    </div>
+
+                    <!-- FORMULÁRIO DE EXERCÍCIO -->
+                    <div id="modalExercicio" class="modal" hidden>
+
+                        <div class="modal-conteudo">
+
+                            <h2 id="tituloModalExercicio">Adicionar exercício</h2>
+
+                            <form id="formExercicio">
+
+                                <div class="campo-formulario">
+                                    <label for="nomeExercicio">Nome do exercício</label>
+                                    <input type="text" id="nomeExercicio" placeholder="Ex.: Supino reto" required>
+                                </div>
+
+                                <div class="campo-formulario">
+                                    <label for="seriesExercicio">Séries</label>
+                                    <input type="number" id="seriesExercicio" min="1" placeholder="Ex.: 3" required>
+                                </div>
+
+                                <div class="campo-formulario">
+                                    <label for="repeticoesExercicio">Repetições ou tempo</label>
+                                    <input type="text" id="repeticoesExercicio"
+                                        placeholder="Ex.: 12 a 15 ou 30 segundos" required>
+                                </div>
+
+                                <div class="botoes-formulario">
+                                    <button type="button" id="btnCancelarExercicio">
+                                        Cancelar
+                                    </button>
+
+                                    <button type="submit" class="botao-principal">
+                                        Salvar exercício
+                                    </button>
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </section>
+            <!-- FORMULÁRIO DE USUÁRIO -->
+            <div id="modalUsuario" class="modal" hidden>
+
+                <div class="modal-conteudo">
+
+                    <h2 id="tituloModalUsuario">Adicionar usuário</h2>
+
+
+                    <form id="formUsuario">
+
+                        <div class="campo-formulario">
+                            <label for="nomeUsuario">Nome completo</label>
+                            <input type="text" id="nomeUsuario" placeholder="Ex.: João Silva" required>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="emailUsuario">E-mail</label>
+                            <input type="email" id="emailUsuario" placeholder="Ex.: joao@email.com" required>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="pesoUsuario">Peso (kg)</label>
+                            <input type="number" id="pesoUsuario" min="1" step="0.1" placeholder="Ex.: 75,5" required>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="idadeUsuario">Idade</label>
+                            <input type="number" id="idadeUsuario" min="1" max="120" placeholder="Ex.: 25" required>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="objetivoUsuario">Objetivo</label>
+                            <select id="objetivoUsuario" required>
+                                <option value="">Selecione um objetivo</option>
+                                <option value="Emagrecimento">Emagrecimento</option>
+                                <option value="Hipertrofia">Hipertrofia</option>
+                                <option value="Condicionamento físico">Condicionamento físico</option>
+                                <option value="Saúde e qualidade de vida">Saúde e qualidade de vida</option>
+                                <option value="Condicionamento e resistência">Condicionamento e resistência</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="observacoesUsuario">Observações (opcional)</label>
+                            <textarea id="observacoesUsuario" rows="3"
+                                placeholder="Informações adicionais sobre o aluno..."></textarea>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="mensalidadeUsuario">Valor da mensalidade (R$)</label>
+                            <input type="number" id="mensalidadeUsuario" min="0.01" step="0.01" placeholder="Ex.: 99,90"
+                                required>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="dataPrimeiroPagamento">Data do primeiro pagamento</label>
+                            <input type="date" id="dataPrimeiroPagamento" required>
+                        </div>
+
+                        <div class="botoes-formulario">
+                            <button type="button" id="btnCancelarUsuario">
+                                Cancelar
+                            </button>
+
+                            <button type="submit" class="botao-principal">
+                                Salvar usuário
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            <!-- FORMULÁRIO DE TREINO -->
+            <div id="modalTreino" class="modal" hidden>
+
+                <div class="modal-conteudo">
+
+                    <h2 id="tituloModalTreino">Adicionar treino</h2>
+
+                    <form id="formTreino">
+
+                        <div class="campo-formulario">
+                            <label for="nomeTreino">Nome do treino</label>
+
+                            <input type="text" id="nomeTreino" placeholder="Ex.: Treino de peito" required>
+                        </div>
+
+                        <div class="botoes-formulario">
+
+                            <button type="button" id="btnCancelarTreino">
+                                Cancelar
+                            </button>
+
+                            <button type="submit" class="botao-principal">
+                                Salvar treino
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
