@@ -1564,3 +1564,38 @@ async function salvarExercicio(
 
 mostrarListaExercicios();
 
+// ALTERNAR TEMA CLARO E ESCURO DA FICHA
+
+const botaoTemaFicha = document.getElementById("alternarTemaFicha");
+
+// Recupera o tema salvo
+const temaSalvo = localStorage.getItem("temaFicha");
+
+if (temaSalvo === "claro") {
+    document.body.classList.add("tema-claro");
+}
+
+function atualizarBotaoTema() {
+    const temaClaro = document.body.classList.contains("tema-claro");
+
+    botaoTemaFicha.setAttribute(
+        "aria-label",
+        temaClaro ? "Ativar tema escuro" : "Ativar tema claro"
+    );
+}
+
+atualizarBotaoTema();
+
+botaoTemaFicha.addEventListener("click", function () {
+
+    document.body.classList.toggle("tema-claro");
+
+    const temaClaro = document.body.classList.contains("tema-claro");
+
+    localStorage.setItem(
+        "temaFicha",
+        temaClaro ? "claro" : "escuro"
+    );
+
+    atualizarBotaoTema();
+});
