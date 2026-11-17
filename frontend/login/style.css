@@ -1,0 +1,549 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    overflow: hidden;
+    transition: background 0.3s, color 0.3s;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 430px;
+    max-height: calc(100dvh - 24px);
+}
+
+.login-card {
+    position: relative;
+    background: #1c1c1c;
+    border: 1px solid #333;
+    border-radius: 16px;
+    padding: clamp(16px, 4vh, 35px);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+
+
+.seletor-tema {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 76px;
+    height: 38px;
+    padding: 3px;
+    border-radius: 30px;
+    background: #292929;
+    border: 1px solid #444;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    cursor: pointer;
+}
+
+
+
+
+/* ÍCONES DO SELETOR */
+
+.seletor-tema .icone-sol,
+.seletor-tema .icone-lua {
+    position: relative;
+    z-index: 2;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+.seletor-tema svg {
+    width: 21px;
+    height: 21px;
+    display: block;
+}
+
+/* CORES E BRILHO */
+
+.icone-sol svg {
+    filter: drop-shadow(0 0 3px rgba(255, 201, 40, 0.35));
+}
+
+.icone-lua svg {
+    filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.45));
+}
+
+
+/* INDICADOR DO SELETOR */
+
+
+.seletor-tema .seletor-indicador {
+    position: absolute;
+    z-index: 1;
+
+    width: 30px;
+    height: 30px;
+
+    left: 3px;
+    top: 50%;
+
+    border-radius: 50%;
+    background: #454545;
+
+    transform: translateY(-50%);
+
+    transition: transform 0.3s ease,
+                background 0.3s ease;
+}
+
+/* MODO ESCURO */
+
+body:not(.tema-claro) .seletor-indicador {
+    transform: translate(40px, -50%);
+}
+
+/* MODO CLARO */
+
+body.tema-claro .seletor-indicador {
+    transform: translate(0, -50%);
+    background: #fff;
+    box-shadow: 0 1px 5px #bbb;
+}
+
+
+/* FUNDO DO SELETOR NO MODO CLARO */
+
+.tema-claro .seletor-tema {
+    background: #eee;
+    border-color: #ddd;
+}
+
+/* ANIMAÇÃO DOS ÍCONES */
+
+.icone-sol svg,
+.icone-lua svg {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* MODO ESCURO */
+
+body:not(.tema-claro) .icone-sol svg {
+    opacity: 0.55;
+    transform: scale(0.85);
+}
+
+body:not(.tema-claro) .icone-lua svg {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+/* MODO CLARO */
+
+body.tema-claro .icone-sol svg {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+body.tema-claro .icone-lua svg {
+    opacity: 0.55;
+    transform: scale(0.85);
+}
+
+
+
+.login-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: clamp(12px, 3vh, 25px);
+}
+
+.login-logo img {
+    width: clamp(110px, 20vh, 180px);
+    max-width: 100%;
+    max-height: 22vh;
+    height: auto;
+    object-fit: contain;
+}
+
+.login-titulo {
+    text-align: center;
+    margin-bottom: clamp(16px, 3vh, 30px);
+}
+
+.login-titulo h1 {
+    color: #fff;
+    font-size: clamp(21px, 3vh, 27px);
+    margin-bottom: 8px;
+}
+
+.login-titulo p {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.campo {
+    margin-bottom: clamp(12px, 2.5vh, 20px);
+}
+
+.campo label {
+    display: block;
+    color: #ddd;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.campo input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background: #292929;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, background 0.3s;
+}
+
+.campo input:focus {
+    border-color: #d49a32;
+}
+
+.campo input::placeholder {
+    color: #888;
+}
+
+.login-opcoes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: 12px;
+}
+
+.login-opcoes label {
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.login-opcoes a {
+    color: #d49a32;
+    text-decoration: none;
+}
+
+.login-opcoes a:hover {
+    text-decoration: underline;
+}
+
+#formLogin button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: #d49a32;
+    color: #171717;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#formLogin button[type="submit"]:hover {
+    background: #e5ad45;
+}
+
+#mensagemLogin {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 13px;
+    color: #e57373;
+}
+
+.login-card footer {
+    border-top: 1px solid #333;
+    margin-top: clamp(16px, 3vh, 30px);
+    padding-top: 15px;
+    text-align: center;
+    color: #777;
+    font-size: 12px;
+}
+
+/* MODO CLARO */
+
+body.tema-claro {
+    background: #eeeeee;
+}
+
+.tema-claro .login-card {
+    background: #fff;
+    border-color: #ddd;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
+}
+
+.tema-claro .login-titulo h1 {
+    color: #222;
+}
+
+.tema-claro .login-titulo p {
+    color: #666;
+}
+
+.tema-claro .campo label {
+    color: #333;
+}
+
+.tema-claro .campo input {
+    background: #f5f5f5;
+    color: #222;
+    border-color: #ccc;
+}
+
+.tema-claro .campo input::placeholder {
+    color: #999;
+}
+
+.tema-claro .login-opcoes label {
+    color: #555;
+}
+
+.tema-claro .login-card footer {
+    border-color: #ddd;
+    color: #777;
+}
+
+.tema-claro .botao-tema {
+    background: #f1f1f1;
+    border-color: #ddd;
+    color: #333;
+}
+
+/* TELAS COM POUCA ALTURA */
+
+@media (max-height: 650px) {
+    .login-card {
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .login-logo {
+        margin-bottom: 8px;
+    }
+
+    .login-logo img {
+        width: 100px;
+        max-height: 15vh;
+    }
+
+    .login-titulo {
+        margin-bottom: 12px;
+    }
+
+    .login-titulo h1 {
+        font-size: 21px;
+    }
+
+    .campo {
+        margin-bottom: 10px;
+    }
+
+    .campo input {
+        padding: 10px 12px;
+    }
+
+    .login-opcoes {
+        margin-bottom: 12px;
+    }
+
+    .login-card footer {
+        margin-top: 12px;
+        padding-top: 10px;
+    }
+}
+
+
+/* DESTAQUE DOS ÍCONES DO TEMA */
+
+.seletor-tema .icone-sol svg,
+.seletor-tema .icone-lua svg {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* MODO ESCURO */
+body:not(.tema-claro) .icone-sol svg {
+    opacity: 0.55;
+    transform: scale(0.85);
+}
+
+body:not(.tema-claro) .icone-lua svg {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+/* MODO CLARO */
+body.tema-claro .icone-sol svg {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+body.tema-claro .icone-lua svg {
+    opacity: 0.55;
+    transform: scale(0.85);
+}
+
+
+/* RECUPERAÇÃO DE SENHA */
+
+#recuperacaoSenha {
+    width: 100%;
+}
+
+#recuperacaoSenha[hidden] {
+    display: none;
+}
+
+#recuperacaoSenha .login-titulo {
+    margin-top: 15px;
+}
+
+#formRecuperacao button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: #d49a32;
+    color: #171717;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#formRecuperacao button:hover {
+    background: #e5ad45;
+}
+
+#mensagemRecuperacao {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 13px;
+    color: #e57373;
+}
+
+.voltar-login {
+    margin-top: 22px;
+    text-align: center;
+}
+
+.voltar-login a {
+    color: #d49a32;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.voltar-login a:hover {
+    text-decoration: underline;
+}
+
+/* MODO CLARO */
+
+.tema-claro #recuperacaoSenha .login-titulo h1 {
+    color: #222;
+}
+
+.tema-claro #recuperacaoSenha .login-titulo p {
+    color: #666;
+}
+
+/* DEFINIÇÃO DE NOVA SENHA */
+
+#novaSenha {
+    width: 100%;
+}
+
+#novaSenha[hidden] {
+    display: none;
+}
+
+#novaSenha .login-titulo {
+    margin-top: 15px;
+}
+
+#formNovaSenha button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: #d49a32;
+    color: #171717;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#formNovaSenha button:hover {
+    background: #e5ad45;
+}
+
+#mensagemNovaSenha {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 13px;
+    color: #e57373;
+}
+
+/* MODO CLARO */
+
+.tema-claro #novaSenha .login-titulo h1 {
+    color: #222;
+}
+
+.tema-claro #novaSenha .login-titulo p {
+    color: #666;
+}
+
+/* OPÇÃO MOSTRAR SENHAS - NOVA SENHA */
+
+.campo-opcoes {
+    margin-top: -5px;
+    margin-bottom: 15px;
+}
+
+.campo-opcoes label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #aaa;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.campo-opcoes input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #d49a32;
+    cursor: pointer;
+}
+
+/* MODO CLARO */
+
+.tema-claro .campo-opcoes label {
+    color: #555;
+}
