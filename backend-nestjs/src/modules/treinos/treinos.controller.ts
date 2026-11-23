@@ -1,102 +1,143 @@
-
 import {
   Body,
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Post,
-  InternalServerErrorException,
-  Logger,
+  Query,
 } from '@nestjs/common';
 
+import {
+  exigirAlunoId,
+  Perfis,
+  UsuarioAtual,
+  type UsuarioAutenticado,
+} from '../../common/decorators.js';
+import {
+  RegistrarExecucaoDto,
+  RegistrarExecucaoLegadoDto,
+} from './treinos.dto.js';
 import { TreinosService } from './treinos.service.js';
+
+const limitar = (valor: number | undefined, padrao: number, maximo: number) =>
+  Math.min(Math.max(valor ?? padrao, 1), maximo);
 
 @Controller()
 export class TreinosController {
-  private readonly logger = new Logger(TreinosController.name);
+  constructor(private readonly treinos: TreinosService) {}
 
-  constructor(private readonly service: TreinosService) {}
+  // ============================================================
+  // ALUNO (o id do aluno vem SEMPRE da sessão)
+  // ============================================================
 
-  @Post('treinos')
-  async salvarTreino(@Body() dados: any) {
-    try {
-      const resultado = await this.service.salvarTreino(dados);
-
-      return {
-        sucesso: true,
-        mensagem: resultado.mensagem,
-        data_treino: resultado.data_treino,
-      };
-    } catch (erro) {
-      this.logger.error('Erro ao salvar treino:', erro);
-
-      if (erro instanceof InternalServerErrorException) {
-        throw erro;
-      }
-
-      throw erro;
-    }
+  @Perfis('ALUNO')
+  @Post('me/execucoes')
+  async registrar(
+    @UsuarioAtual() usuario: UsuarioAutenticado,
+    @Body() dto: RegistrarExecucaoDto,
+  ) {
+    const resultado = await this.treinos.registrar(exigirAlunoId(usuario), dto);
+    return { sucesso: true, ...resultado };
   }
 
+  @Perfis('ALUNO')
+  @Get('me/execucoes')
+  listar(
+    @UsuarioAtual() usuario: UsuarioAutenticado,
+    @Query('limite', new ParseIntPipe({ optional: true })) limite?: number,
+  ) {
+    return this.treinos.listarExecucoes(
+      exigirAlunoId(usuario),
+      limitar(limite, 50, 200),
+    );
+  }
+
+  @Perfis('ALUNO')
+  @Get('me/exercicios/:id/ultimo')
+  ultimo(
+    @UsuarioAtual() usuario: UsuarioAutenticado,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.treinos.ultimo(exigirAlunoId(usuario), id);
+  }
+
+  @Perfis('ALUNO')
+  @Get('me/exercicios/:id/historico')
+  historico(
+    @UsuarioAtual() usuario: UsuarioAutenticado,
+    @Param('id', ParseIntPipe) id: number,
+    @Query('limite', new ParseIntPipe({ optional: true })) limite?: number,
+  ) {
+    return this.treinos.historico(
+      exigirAlunoId(usuario),
+      id,
+      limitar(limite, 10, 50),
+    );
+  }
+
+  // ============================================================
+  // ROTAS ANTIGAS (compatibilidade): agora exigem login de ALUNO e
+  // sempre filtram pelo aluno da sessão. O frontend novo não as usa.
+  // ============================================================
+
+  @Perfis('ALUNO')
+  @Post('treinos')
+  async salvarTreinoLegado(
+    @UsuarioAtual() usuario: UsuarioAutenticado,
+    @Body() dto: RegistrarExecucaoLegadoDto,
+  ) {
+    const alunoId = exigirAlunoId(usuario);
+    const exercicioId = await this.treinos.exercicioIdPorNome(
+      alunoId,
+      dto.exercicio,
+      dto.treino,
+    );
+
+    const resultado = await this.treinos.registrar(alunoId, {
+      exercicioId,
+      valor: dto.valor,
+      series: dto.series,
+    });
+
+    return { sucesso: true, ...resultado };
+  }
+
+  @Perfis('ALUNO')
   @Get('ultimo-treino/:treino/:exercicio')
-  async buscarUltimoTreino(
-    @Param('treino') treino: string,
+  ultimoLegado(
+    @UsuarioAtual() usuario: UsuarioAutenticado,
     @Param('exercicio') exercicio: string,
   ) {
-    try {
-      return await this.service.buscarUltimoTreino(
-        treino,
-        decodeURIComponent(exercicio),
-      );
-    } catch (erro) {
-      this.logger.error('Erro ao buscar último treino:', erro);
-
-      throw new InternalServerErrorException({
-        sucesso: false,
-        mensagem: 'Erro ao buscar último treino.',
-        erro: erro instanceof Error ? erro.message : String(erro),
-      });
-    }
+    return this.treinos.ultimoPorNome(exigirAlunoId(usuario), exercicio);
   }
 
+  @Perfis('ALUNO')
+  @Get('historico/:treino/:exercicio')
+  historicoLegado(
+    @UsuarioAtual() usuario: UsuarioAutenticado,
+    @Param('exercicio') exercicio: string,
+  ) {
+    return this.treinos.historicoPorNome(exigirAlunoId(usuario), exercicio);
+  }
+
+  // ============================================================
+  // ADMINISTRADOR
+  // ============================================================
+
+  @Perfis('ADMIN')
+  @Get('alunos/:id/execucoes')
+  execucoesDoAluno(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('limite', new ParseIntPipe({ optional: true })) limite?: number,
+  ) {
+    return this.treinos.execucoesDoAluno(id, limitar(limite, 100, 300));
+  }
+
+  /** Antes era pública e devolvia a tabela inteira. Agora só o administrador. */
+  @Perfis('ADMIN')
   @Get('treinos')
-  async buscarTodos() {
-    try {
-      const treinos = await this.service.buscarTodos();
-
-      return {
-        sucesso: true,
-        treinos,
-      };
-    } catch (erro) {
-      this.logger.error('Erro ao buscar treinos:', erro);
-
-      throw new InternalServerErrorException({
-        sucesso: false,
-        mensagem: 'Erro ao buscar treinos.',
-        erro: erro instanceof Error ? erro.message : String(erro),
-      });
-    }
-  }
-
-  @Get('teste-mysql')
-  async testarConexao() {
-    try {
-      const resultado = await this.service.testarConexao();
-
-      return {
-        sucesso: true,
-        mensagem: 'MySQL conectado com sucesso! 🗄️',
-        resultado,
-      };
-    } catch (erro) {
-      this.logger.error('Erro ao conectar no MySQL:', erro);
-
-      throw new InternalServerErrorException({
-        sucesso: false,
-        mensagem: 'Erro ao conectar no MySQL.',
-        erro: erro instanceof Error ? erro.message : String(erro),
-      });
-    }
+  async todos() {
+    return { sucesso: true, treinos: await this.treinos.todosOsRegistros() };
   }
 }

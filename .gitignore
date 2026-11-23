@@ -1,0 +1,27 @@
+# ==========================================
+# Projeto Caverna - .gitignore da raiz
+# ==========================================
+
+# Variaveis de ambiente (qualquer pasta do projeto)
+.env
+.env.*
+*.env
+
+# Apenas os modelos sem valores reais podem ser versionados
+!.env.example
+!**/.env.example
+
+# Dependencias
+node_modules/
+
+# Compilacao
+dist/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

@@ -2,6 +2,9 @@
 # Dependências
 node_modules/
 
+# Prisma Client gerado (recriado por "prisma generate" no build)
+src/generated/
+
 # Compilação
 dist/
 *.tsbuildinfo
@@ -12,6 +15,7 @@ src/**/*.d.ts
 # Variáveis de ambiente
 .env
 .env.*
+!.env.example
 
 # Logs
 *.log

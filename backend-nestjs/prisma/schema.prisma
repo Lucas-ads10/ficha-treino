@@ -1,0 +1,243 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  // Projeto ESM (nodenext): imports relativos precisam terminar em .js
+  importFileExtension = "js"
+  moduleFormat        = "esm"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum Perfil {
+  ADMIN
+  ALUNO
+}
+
+// Status exibidos no painel: Ativo / Pendente / Bloqueado.
+// PENDENTE = cadastrado, mas ainda não definiu a senha (primeiro acesso).
+enum StatusUsuario {
+  ATIVO
+  PENDENTE
+  BLOQUEADO
+}
+
+enum TipoToken {
+  CONVITE
+  RECUPERACAO
+}
+
+// NORMAL = carga x repetições; TEMPO = segundos por série; CARDIO = minutos.
+enum TipoExercicio {
+  NORMAL
+  TEMPO
+  CARDIO
+}
+
+// ============================================================
+// USUÁRIOS E AUTENTICAÇÃO
+// ============================================================
+
+model Usuario {
+  id               Int           @id @default(autoincrement())
+  nome             String        @db.VarChar(120)
+  email            String        @unique @db.VarChar(190)
+  // null enquanto o aluno ainda não criou a senha (convite pendente).
+  // Guarda SOMENTE o hash Argon2id, nunca a senha.
+  senhaHash        String?       @map("senha_hash") @db.VarChar(255)
+  perfil           Perfil
+  status           StatusUsuario @default(PENDENTE)
+  deveTrocarSenha  Boolean       @default(false) @map("deve_trocar_senha")
+  tentativasFalhas Int           @default(0) @map("tentativas_falhas")
+  bloqueadoAte     DateTime?     @map("bloqueado_ate")
+  ultimoAcessoEm   DateTime?     @map("ultimo_acesso_em")
+  // Exclusão lógica: preserva histórico de pagamentos e treinos.
+  excluidoEm       DateTime?     @map("excluido_em")
+  criadoEm         DateTime      @default(now()) @map("criado_em")
+  atualizadoEm     DateTime      @updatedAt @map("atualizado_em")
+
+  aluno                 Aluno?
+  sessoes               Sessao[]
+  tokens                TokenAcesso[]
+  pagamentosRegistrados Pagamento[]   @relation("PagamentosRegistrados")
+
+  @@map("usuarios")
+}
+
+model Sessao {
+  id          Int       @id @default(autoincrement())
+  usuarioId   Int       @map("usuario_id")
+  // SHA-256 do token do cookie; o token em si nunca é gravado.
+  tokenHash   String    @unique @map("token_hash") @db.Char(64)
+  // Token anti-CSRF desta sessão (enviado no header X-CSRF-Token).
+  csrfToken   String    @map("csrf_token") @db.Char(64)
+  criadaEm    DateTime  @default(now()) @map("criada_em")
+  ultimoUsoEm DateTime  @default(now()) @map("ultimo_uso_em")
+  expiraEm    DateTime  @map("expira_em")
+  revogadaEm  DateTime? @map("revogada_em")
+  userAgent   String?   @map("user_agent") @db.VarChar(255)
+  ip          String?   @db.VarChar(64)
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@map("sessoes")
+}
+
+model TokenAcesso {
+  id        Int       @id @default(autoincrement())
+  usuarioId Int       @map("usuario_id")
+  tipo      TipoToken
+  // SHA-256 do token enviado por e-mail; o token em si nunca é gravado.
+  tokenHash String    @unique @map("token_hash") @db.Char(64)
+  expiraEm  DateTime  @map("expira_em")
+  usadoEm   DateTime? @map("usado_em")
+  criadoEm  DateTime  @default(now()) @map("criado_em")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId, tipo])
+  @@map("tokens_acesso")
+}
+
+// ============================================================
+// ALUNOS (campos do formulário "Adicionar usuário" do painel)
+// ============================================================
+
+model Aluno {
+  id                    Int      @id @default(autoincrement())
+  usuarioId             Int      @unique @map("usuario_id")
+  peso                  Decimal  @db.Decimal(5, 2)
+  idade                 Int
+  objetivo              String   @db.VarChar(60)
+  observacoes           String?  @db.Text
+  mensalidade           Decimal  @db.Decimal(10, 2)
+  dataPrimeiroPagamento DateTime @map("data_primeiro_pagamento") @db.Date
+  criadoEm              DateTime @default(now()) @map("criado_em")
+
+  usuario    Usuario           @relation(fields: [usuarioId], references: [id], onDelete: Restrict)
+  fichas     Ficha[]
+  pagamentos Pagamento[]
+  execucoes  TreinoRealizado[]
+
+  @@map("alunos")
+}
+
+// ============================================================
+// PAGAMENTOS
+// ============================================================
+
+model Pagamento {
+  id              Int      @id @default(autoincrement())
+  alunoId         Int      @map("aluno_id")
+  valor           Decimal  @db.Decimal(10, 2)
+  dataPagamento   DateTime @map("data_pagamento") @db.Date
+  forma           String?  @db.VarChar(40)
+  registradoPorId Int?     @map("registrado_por_id")
+  criadoEm        DateTime @default(now()) @map("criado_em")
+
+  aluno         Aluno    @relation(fields: [alunoId], references: [id], onDelete: Restrict)
+  registradoPor Usuario? @relation("PagamentosRegistrados", fields: [registradoPorId], references: [id], onDelete: SetNull)
+
+  @@index([alunoId, dataPagamento])
+  @@map("pagamentos")
+}
+
+// ============================================================
+// FICHAS DE TREINO
+//
+// Ficha = conjunto de treinos (divisões) de UM aluno. Cada aluno tem no
+// máximo UMA ficha atual (ativa = true). Substituir a ficha encerra a
+// anterior (encerradaEm) e cria outra: as anteriores ficam para consulta.
+// ============================================================
+
+model Ficha {
+  id          Int       @id @default(autoincrement())
+  alunoId     Int       @map("aluno_id")
+  nome        String    @default("Ficha de treino") @db.VarChar(120)
+  // true = ficha atual; NULL = encerrada. O índice único abaixo garante
+  // uma única ficha atual por aluno (o MySQL ignora NULL em índices únicos).
+  ativa       Boolean?
+  iniciadaEm  DateTime  @default(now()) @map("iniciada_em")
+  encerradaEm DateTime? @map("encerrada_em")
+
+  aluno    Aluno          @relation(fields: [alunoId], references: [id], onDelete: Restrict)
+  divisoes FichaDivisao[]
+
+  @@unique([alunoId, ativa])
+  @@index([alunoId])
+  @@map("fichas")
+}
+
+// Divisão = "treino" do painel (ex.: "Treino A", "Treino de pernas").
+model FichaDivisao {
+  id         Int       @id @default(autoincrement())
+  fichaId    Int       @map("ficha_id")
+  nome       String    @db.VarChar(120)
+  ordem      Int       @default(0)
+  excluidoEm DateTime? @map("excluido_em")
+
+  ficha      Ficha            @relation(fields: [fichaId], references: [id], onDelete: Restrict)
+  exercicios FichaExercicio[]
+
+  @@index([fichaId])
+  @@map("ficha_divisoes")
+}
+
+model FichaExercicio {
+  id            Int           @id @default(autoincrement())
+  divisaoId     Int           @map("divisao_id")
+  nome          String        @db.VarChar(150)
+  tipo          TipoExercicio @default(NORMAL)
+  series        Int
+  // Texto livre, como no painel: "12 a 15", "30 segundos", "20 a 30 minutos".
+  repeticoes    String        @db.VarChar(160)
+  cargaSugerida Decimal?      @map("carga_sugerida") @db.Decimal(10, 2)
+  descansoSeg   Int?          @map("descanso_seg")
+  observacoes   String?       @db.Text
+  ordem         Int           @default(0)
+  excluidoEm    DateTime?     @map("excluido_em")
+  criadoEm      DateTime      @default(now()) @map("criado_em")
+  atualizadoEm  DateTime      @updatedAt @map("atualizado_em")
+
+  divisao   FichaDivisao      @relation(fields: [divisaoId], references: [id], onDelete: Restrict)
+  execucoes TreinoRealizado[]
+
+  @@index([divisaoId])
+  @@map("ficha_exercicios")
+}
+
+// ============================================================
+// EXECUÇÕES (histórico de treinos realizados)
+//
+// TABELA LEGADA — já existe em produção, com 278 registros SEM dono.
+// As colunas aluno_id e ficha_exercicio_id são NOVAS e NULAS: os
+// registros antigos permanecem intactos e sem vínculo com alunos.
+// Os campos treino/exercicio já guardam o NOME no momento da execução
+// (snapshot): editar ou apagar um exercício da ficha não altera o passado.
+// ============================================================
+
+model TreinoRealizado {
+  id               Int      @id @default(autoincrement())
+  treino           String   @db.VarChar(100)
+  exercicio        String   @db.VarChar(150)
+  serie            Int
+  carga            Decimal? @db.Decimal(10, 2)
+  repeticoes       Int?
+  valorTempo       Decimal? @map("valor_tempo") @db.Decimal(10, 2)
+  dataTreino       DateTime @map("data_treino") @db.DateTime(0)
+  alunoId          Int?     @map("aluno_id")
+  fichaExercicioId Int?     @map("ficha_exercicio_id")
+
+  aluno          Aluno?          @relation(fields: [alunoId], references: [id], onDelete: Restrict)
+  fichaExercicio FichaExercicio? @relation(fields: [fichaExercicioId], references: [id], onDelete: SetNull)
+
+  @@index([alunoId, exercicio, dataTreino])
+  @@index([fichaExercicioId])
+  @@map("treinos_realizados")
+}
