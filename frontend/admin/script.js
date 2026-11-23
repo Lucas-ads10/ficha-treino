@@ -768,22 +768,51 @@ function atualizarGraficoPagamentos(emDia, atrasados) {
 const API_URL = window.CAVERNA_CONFIG.API_URL;
 let csrfToken = null;
 
-async function carregarAlunos() {
+async function requisicaoAdmin(endpoint, opcoes = {}) {
+    const metodo = (opcoes.method || "GET").toUpperCase();
 
-    try {
+    const headers = {
+        ...(opcoes.headers || {})
+    };
 
-        const resposta = await fetch(`${API_URL}/alunos`, {
-            method: "GET",
-            credentials: "include"
-        });
+    if (opcoes.body !== undefined) {
+        headers["Content-Type"] = "application/json";
+    }
 
-        if (!resposta.ok) {
-            throw new Error(`Erro ao carregar alunos: ${resposta.status}`);
+    if (!["GET", "HEAD", "OPTIONS"].includes(metodo)) {
+        if (!csrfToken) {
+            throw new Error("Sessão de segurança inválida. Entre novamente.");
         }
 
-        const dados = await resposta.json();
+        headers["X-CSRF-Token"] = csrfToken;
+    }
 
-        if (!dados.sucesso || !Array.isArray(dados.alunos)) {
+    const resposta = await fetch(`${API_URL}${endpoint}`, {
+        ...opcoes,
+        method: metodo,
+        credentials: "include",
+        headers
+    });
+
+    const dados = await resposta.json().catch(() => ({}));
+
+    if (!resposta.ok || dados.sucesso === false) {
+        const mensagem = Array.isArray(dados.message)
+            ? dados.message.join(", ")
+            : dados.message || dados.mensagem;
+
+        throw new Error(mensagem || `Erro na API (${resposta.status}).`);
+    }
+
+    return dados;
+}
+
+
+async function carregarAlunos() {
+    try {
+        const dados = await requisicaoAdmin("/alunos");
+
+        if (!Array.isArray(dados.alunos)) {
             throw new Error("Resposta inválida da API de alunos.");
         }
 
@@ -792,15 +821,15 @@ async function carregarAlunos() {
         return true;
 
     } catch (erro) {
-
         console.error("Erro ao carregar alunos:", erro);
 
-        alert("Não foi possível carregar os alunos. Atualize a página ou tente novamente.");
+        alert(
+            erro.message ||
+            "Não foi possível carregar os alunos. Atualize a página ou tente novamente."
+        );
 
         return false;
-
     }
-
 }
 
 
@@ -1055,29 +1084,45 @@ function editarExercicio(id) {
 // EXCLUIR EXERCÍCIO
 // ==========================================
 
-function excluirExercicio(id) {
 
+async function excluirExercicio(id) {
     const confirmar = confirm(
         "Tem certeza que deseja excluir este exercício?"
     );
 
     if (!confirmar) return;
 
-    treinoSelecionado.exercicios =
-        treinoSelecionado.exercicios.filter(
-            exercicio => exercicio.id !== id
-        );
+    const exercicio = treinoSelecionado?.exercicios.find(
+        item => item.id === id
+    );
 
-    mostrarExercicios();
-    mostrarTreinosUsuario();
-    atualizarPainel();
+    if (!exercicio) {
+        alert("Exercício não encontrado.");
+        return;
+    }
 
-    alert("Exercício excluído com sucesso!");
+    try {
+        await requisicaoAdmin(`/exercicios/${id}`, {
+            method: "DELETE"
+        });
+
+        treinoSelecionado.exercicios =
+            treinoSelecionado.exercicios.filter(
+                item => item.id !== id
+            );
+
+        mostrarExercicios();
+        mostrarTreinosUsuario();
+        atualizarPainel();
+
+        alert("Exercício excluído com sucesso!");
+
+    } catch (erro) {
+        console.error("Erro ao excluir exercício:", erro);
+        alert(erro.message || "Não foi possível excluir o exercício.");
+    }
 }
 
-// ==========================================
-// EDITAR TREINO
-// ==========================================
 
 // ==========================================
 // EDITAR TREINO PELO FORMULÁRIO
@@ -1111,7 +1156,12 @@ function editarTreino(id) {
 // EXCLUIR TREINO
 // ==========================================
 
-function excluirTreino(id) {
+
+async function excluirTreino(id) {
+    if (!usuarioSelecionado) {
+        alert("Selecione um aluno primeiro.");
+        return;
+    }
 
     const treino = usuarioSelecionado.treinos.find(
         item => item.id === id
@@ -1128,74 +1178,195 @@ function excluirTreino(id) {
 
     if (!confirmar) return;
 
-    usuarioSelecionado.treinos =
-        usuarioSelecionado.treinos.filter(
-            item => item.id !== id
-        );
+    try {
+        await requisicaoAdmin(`/divisoes/${id}`, {
+            method: "DELETE"
+        });
 
-    mostrarTreinosUsuario();
-    atualizarPainel();
+        usuarioSelecionado.treinos =
+            usuarioSelecionado.treinos.filter(
+                item => item.id !== id
+            );
 
-    alert("Treino excluído com sucesso!");
+        if (treinoSelecionado?.id === id) {
+            treinoSelecionado = null;
+        }
+
+        mostrarTreinosUsuario();
+        atualizarPainel();
+
+        alert("Treino excluído com sucesso!");
+
+    } catch (erro) {
+        console.error("Erro ao excluir treino:", erro);
+        alert(erro.message || "Não foi possível excluir o treino.");
+    }
 }
+
+async function excluirTreino(id) {
+    if (!usuarioSelecionado) {
+        alert("Selecione um aluno primeiro.");
+        return;
+    }
+
+    const treino = usuarioSelecionado.treinos.find(
+        item => item.id === id
+    );
+
+    if (!treino) {
+        alert("Treino não encontrado.");
+        return;
+    }
+
+    const confirmar = confirm(
+        `Tem certeza que deseja excluir "${treino.nome}" e todos os seus exercícios?`
+    );
+
+    if (!confirmar) return;
+
+    try {
+        await requisicaoAdmin(`/divisoes/${id}`, {
+            method: "DELETE"
+        });
+
+        usuarioSelecionado.treinos =
+            usuarioSelecionado.treinos.filter(
+                item => item.id !== id
+            );
+
+        if (treinoSelecionado?.id === id) {
+            treinoSelecionado = null;
+        }
+
+        mostrarTreinosUsuario();
+        atualizarPainel();
+
+        alert("Treino excluído com sucesso!");
+
+    } catch (erro) {
+        console.error("Erro ao excluir treino:", erro);
+        alert(erro.message || "Não foi possível excluir o treino.");
+    }
+}
+
 
 // ==========================================
 // SALVAR EXERCÍCIO PELO FORMULÁRIO
 // ==========================================
 
+
 document.getElementById("formExercicio").addEventListener(
     "submit",
-    function (event) {
-
+    async function (event) {
         event.preventDefault();
+
+        if (!treinoSelecionado || !usuarioSelecionado) {
+            alert("Selecione um aluno e um treino primeiro.");
+            return;
+        }
+
+        const formulario = this;
+        const botaoSalvar = formulario.querySelector('button[type="submit"]');
 
         const nome = normalizarNome(
             document.getElementById("nomeExercicio").value
         );
-        const series = Number(document.getElementById("seriesExercicio").value);
-        const repeticoes = document.getElementById("repeticoesExercicio").value.trim();
 
-        if (!nome || !Number.isInteger(series) || series < 1 || !repeticoes) {
-            alert("Preencha todos os campos corretamente.");
+        const series = Number(
+            document.getElementById("seriesExercicio").value
+        );
+
+        const repeticoes = document
+            .getElementById("repeticoesExercicio")
+            .value.trim();
+
+        if (
+            !nome ||
+            !Number.isInteger(series) ||
+            series < 1 ||
+            series > 30 ||
+            !repeticoes
+        ) {
+            alert("Preencha os campos corretamente. O máximo é 30 séries.");
             return;
         }
 
-        if (exercicioEditandoId !== null) {
-
-            const exercicio = treinoSelecionado.exercicios.find(
+        const exercicioExistente = exercicioEditandoId !== null
+            ? treinoSelecionado.exercicios.find(
                 item => item.id === exercicioEditandoId
-            );
+            )
+            : null;
 
-            if (!exercicio) {
-                alert("Exercício não encontrado.");
-                return;
-            }
-
-            exercicio.nome = nome;
-            exercicio.series = series;
-            exercicio.repeticoes = repeticoes;
-
-        } else {
-
-            treinoSelecionado.exercicios.push({
-                id: Date.now(),
-                nome: nome,
-                series: series,
-                repeticoes: repeticoes
-            });
-
+        if (exercicioEditandoId !== null && !exercicioExistente) {
+            alert("Exercício não encontrado.");
+            return;
         }
 
-        document.getElementById("modalExercicio").hidden = true;
+        const dados = {
+            nome,
+            series,
+            repeticoes
+        };
 
-        exercicioEditandoId = null;
+        // Preserva os campos opcionais já cadastrados.
+        if (exercicioExistente) {
+            dados.tipo = exercicioExistente.tipo || "AUTO";
+            dados.cargaSugerida = exercicioExistente.cargaSugerida ?? null;
+            dados.descansoSeg = exercicioExistente.descansoSeg ?? null;
+            dados.observacoes = exercicioExistente.observacoes ?? "";
+        }
 
-        mostrarExercicios();
-        mostrarTreinosUsuario();
-        atualizarPainel();
+        botaoSalvar.disabled = true;
 
+        try {
+            if (exercicioEditandoId !== null) {
+                const resposta = await requisicaoAdmin(
+                    `/exercicios/${exercicioEditandoId}`,
+                    {
+                        method: "PATCH",
+                        body: JSON.stringify(dados)
+                    }
+                );
+
+                const indice = treinoSelecionado.exercicios.findIndex(
+                    item => item.id === exercicioEditandoId
+                );
+
+                treinoSelecionado.exercicios[indice] = resposta.exercicio;
+
+            } else {
+                const resposta = await requisicaoAdmin(
+                    `/divisoes/${treinoSelecionado.id}/exercicios`,
+                    {
+                        method: "POST",
+                        body: JSON.stringify(dados)
+                    }
+                );
+
+                treinoSelecionado.exercicios.push(resposta.exercicio);
+            }
+
+            document.getElementById("modalExercicio").hidden = true;
+
+            formulario.reset();
+            exercicioEditandoId = null;
+
+            mostrarExercicios();
+            mostrarTreinosUsuario();
+            atualizarPainel();
+
+            alert("Exercício salvo com sucesso!");
+
+        } catch (erro) {
+            console.error("Erro ao salvar exercício:", erro);
+            alert(erro.message || "Não foi possível salvar o exercício.");
+
+        } finally {
+            botaoSalvar.disabled = false;
+        }
     }
 );
+
 
 // ==========================================
 // CANCELAR FORMULÁRIO
@@ -1406,11 +1577,19 @@ document.getElementById("btnCancelarUsuario").addEventListener(
 // SALVAR TREINO PELO FORMULÁRIO
 // ==========================================
 
+
 document.getElementById("formTreino").addEventListener(
     "submit",
-    function (event) {
-
+    async function (event) {
         event.preventDefault();
+
+        if (!usuarioSelecionado) {
+            alert("Selecione um usuário primeiro.");
+            return;
+        }
+
+        const formulario = this;
+        const botaoSalvar = formulario.querySelector('button[type="submit"]');
 
         const nome = normalizarNome(
             document.getElementById("nomeTreino").value
@@ -1433,7 +1612,6 @@ document.getElementById("formTreino").addEventListener(
         }
 
         if (treinoEditandoId !== null) {
-
             const treino = usuarioSelecionado.treinos.find(
                 item => item.id === treinoEditandoId
             );
@@ -1442,30 +1620,73 @@ document.getElementById("formTreino").addEventListener(
                 alert("Treino não encontrado.");
                 return;
             }
-
-            treino.nome = nome;
-
-        } else {
-
-            usuarioSelecionado.treinos.push({
-                id: Date.now(),
-                nome: nome,
-                exercicios: []
-            });
-
         }
 
-        document.getElementById("modalTreino").hidden = true;
+        botaoSalvar.disabled = true;
 
-        document.getElementById("formTreino").reset();
+        try {
+            // Garante que o aluno tenha uma ficha ativa.
+            if (!usuarioSelecionado.fichaId) {
+                const respostaFicha = await requisicaoAdmin("/fichas", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        alunoId: usuarioSelecionado.id,
+                        nome: "Ficha de treino"
+                    })
+                });
 
-        treinoEditandoId = null;
+                usuarioSelecionado.fichaId = respostaFicha.ficha.id;
+            }
 
-        mostrarTreinosUsuario();
-        atualizarPainel();
+            if (treinoEditandoId !== null) {
+                const resposta = await requisicaoAdmin(
+                    `/divisoes/${treinoEditandoId}`,
+                    {
+                        method: "PATCH",
+                        body: JSON.stringify({ nome })
+                    }
+                );
 
+                const treino = usuarioSelecionado.treinos.find(
+                    item => item.id === treinoEditandoId
+                );
+
+                treino.nome = resposta.treino.nome;
+
+            } else {
+                const resposta = await requisicaoAdmin(
+                    `/fichas/${usuarioSelecionado.fichaId}/divisoes`,
+                    {
+                        method: "POST",
+                        body: JSON.stringify({ nome })
+                    }
+                );
+
+                usuarioSelecionado.treinos.push({
+                    ...resposta.treino,
+                    exercicios: resposta.treino.exercicios || []
+                });
+            }
+
+            document.getElementById("modalTreino").hidden = true;
+            formulario.reset();
+            treinoEditandoId = null;
+
+            mostrarTreinosUsuario();
+            atualizarPainel();
+
+            alert("Treino salvo com sucesso!");
+
+        } catch (erro) {
+            console.error("Erro ao salvar treino:", erro);
+            alert(erro.message || "Não foi possível salvar o treino.");
+
+        } finally {
+            botaoSalvar.disabled = false;
+        }
     }
 );
+
 
 // ==========================================
 // CANCELAR FORMULÁRIO DE TREINO

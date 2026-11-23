@@ -708,3 +708,55 @@ body.tema-claro .tema-lua {
 [hidden] {
     display: none !important;
 }
+
+
+/* ==========================================
+   HISTÓRICO DE EXERCÍCIOS
+========================================== */
+
+.historico-exercicios {
+    margin-top: 22px;
+    padding: 20px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.historico-exercicios h3 {
+    margin: 0 0 18px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.sessao-historico {
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.sessao-historico:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.data-historico {
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.sessao-historico .linha-ultimo {
+    margin-bottom: 8px;
+}
+
+.sessao-historico .linha-ultimo:last-child {
+    margin-bottom: 0;
+}
+
+body.tema-claro .historico-exercicios {
+    background: rgba(0, 0, 0, 0.025);
+    border-color: rgba(0, 0, 0, 0.10);
+}
+
+body.tema-claro .sessao-historico {
+    border-color: rgba(0, 0, 0, 0.10);
+}

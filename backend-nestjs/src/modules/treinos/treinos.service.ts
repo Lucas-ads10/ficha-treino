@@ -32,7 +32,7 @@ function linhaParaVisao(linha: LinhaExecucao) {
 
 @Injectable()
 export class TreinosService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   // ------------------------------------------------------------
   // Registrar treino realizado
@@ -124,7 +124,39 @@ export class TreinosService {
   /** Último treino de um exercício da ficha do aluno. */
   async ultimo(alunoId: number, exercicioId: number) {
     const nome = await this.nomeDoExercicio(alunoId, exercicioId);
-    return this.ultimoPorNome(alunoId, nome);
+
+    const recente = await this.prisma.treinoRealizado.findFirst({
+      where: { alunoId, fichaExercicioId: exercicioId },
+      orderBy: { dataTreino: 'desc' },
+      select: { dataTreino: true },
+    });
+
+    if (!recente) {
+      return {
+        sucesso: true,
+        encontrado: false,
+        exercicio: nome,
+        data_treino: null,
+        series: [],
+      };
+    }
+
+    const linhas = await this.prisma.treinoRealizado.findMany({
+      where: {
+        alunoId,
+        fichaExercicioId: exercicioId,
+        dataTreino: recente.dataTreino,
+      },
+      orderBy: { serie: 'asc' },
+    });
+
+    return {
+      sucesso: true,
+      encontrado: true,
+      exercicio: nome,
+      data_treino: recente.dataTreino,
+      series: linhas.map(linhaParaVisao),
+    };
   }
 
   async ultimoPorNome(alunoId: number, exercicio: string) {
@@ -160,9 +192,33 @@ export class TreinosService {
 
   /** Histórico de um exercício, agrupado por dia/horário (mais recente primeiro). */
   async historico(alunoId: number, exercicioId: number, limite = 10) {
-    const nome = await this.nomeDoExercicio(alunoId, exercicioId);
-    return this.historicoPorNome(alunoId, nome, limite);
+  const nome = await this.nomeDoExercicio(alunoId, exercicioId);
+
+  const linhas = await this.prisma.treinoRealizado.findMany({
+    where: { alunoId, fichaExercicioId: exercicioId },
+    orderBy: [{ dataTreino: 'desc' }, { serie: 'asc' }],
+    take: 30 * limite,
+  });
+
+  const sessoes = new Map<number, ReturnType<typeof linhaParaVisao>[]>();
+
+  for (const linha of linhas) {
+    const chave = linha.dataTreino.getTime();
+    sessoes.set(chave, [
+      ...(sessoes.get(chave) ?? []),
+      linhaParaVisao(linha),
+    ]);
   }
+
+  return {
+    sucesso: true,
+    exercicio: nome,
+    sessoes: [...sessoes.entries()].slice(0, limite).map(([chave, series]) => ({
+      data_treino: new Date(chave),
+      series,
+    })),
+  };
+}
 
   async historicoPorNome(alunoId: number, exercicio: string, limite = 10) {
     const linhas = await this.prisma.treinoRealizado.findMany({

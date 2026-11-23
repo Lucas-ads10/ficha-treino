@@ -123,51 +123,32 @@ function formatarData(data) {
 
 
 // ==========================================
-// BUSCAR ÚLTIMO TREINO NO MYSQL
+// BUSCAR ÚLTIMO TREINO PELO ID DO EXERCÍCIO
 // ==========================================
 
-async function buscarUltimoTreino(
-    treino,
-    exercicio
-) {
+async function buscarUltimoTreino(exercicioId) {
 
     try {
 
-        const url =
-            `${API_URL}/ultimo-treino/` +
-            `${encodeURIComponent(treino)}/` +
-            `${encodeURIComponent(exercicio)}`;
-
-
-        const resposta =
-            await fetch(url, {
+        const resposta = await fetch(
+            `${API_URL}/me/exercicios/${exercicioId}/ultimo`,
+            {
                 method: "GET",
                 credentials: "include"
-            });
-
+            }
+        );
 
         if (!resposta.ok) {
-
-            throw new Error(
-                `Erro HTTP: ${resposta.status}`
-            );
-
+            throw new Error(`Erro HTTP: ${resposta.status}`);
         }
 
-
-        const dados =
-            await resposta.json();
-
+        const dados = await resposta.json();
 
         if (!dados.sucesso) {
-
             throw new Error(
-                dados.mensagem ||
-                "Erro ao buscar treino."
+                dados.mensagem || "Erro ao buscar treino."
             );
-
         }
-
 
         return dados;
 
@@ -178,17 +159,56 @@ async function buscarUltimoTreino(
             erro
         );
 
+        return {
+            sucesso: false,
+            encontrado: false,
+            series: [],
+            data_treino: null
+        };
+
+    }
+
+}
+
+
+
+// ==========================================
+// BUSCAR HISTÓRICO PELO ID DO EXERCÍCIO
+// ==========================================
+
+async function buscarHistorico(exercicioId) {
+
+    try {
+
+        const resposta = await fetch(
+            `${API_URL}/me/exercicios/${exercicioId}/historico`,
+            {
+                method: "GET",
+                credentials: "include"
+            }
+        );
+
+        if (!resposta.ok) {
+            throw new Error(`Erro HTTP: ${resposta.status}`);
+        }
+
+        const dados = await resposta.json();
+
+        if (!dados.sucesso) {
+            throw new Error(
+                dados.mensagem || "Erro ao buscar histórico."
+            );
+        }
+
+        return dados;
+
+    } catch (erro) {
+
+        console.error("Erro ao buscar histórico:", erro);
 
         return {
-
             sucesso: false,
-
-            encontrado: false,
-
-            series: [],
-
-            data_treino: null
-
+            sessoes: []
         };
 
     }
@@ -246,15 +266,7 @@ async function mostrarListaExercicios() {
             treino.exercicios.map(
                 async function (exercicio) {
 
-                    const dados =
-                        await buscarUltimoTreino(
-
-                            treinoSelecionado,
-
-                            exercicio.nome
-
-                        );
-
+                    const dados = await buscarUltimoTreino(exercicio.id);
 
                     return {
 
@@ -488,11 +500,10 @@ async function abrirExercicio(index) {
     // BUSCAR NO MYSQL
     // ======================================
 
-    const dados =
-        await buscarUltimoTreino(
-            treino.nome,
-            exercicio.nome
-        );
+    const [dados, historico] = await Promise.all([
+        buscarUltimoTreino(exercicio.id),
+        buscarHistorico(exercicio.id)
+    ]);
 
 
     ultimoTreinoAtual =
@@ -502,10 +513,90 @@ async function abrirExercicio(index) {
     mostrarExercicio(
         exercicio,
         index,
-        dados
+        dados,
+        historico
     );
 
 }
+
+
+
+function montarHistoricoHTML(exercicio, historico) {
+
+    if (
+        !historico ||
+        !historico.sucesso ||
+        !historico.sessoes ||
+        historico.sessoes.length === 0
+    ) {
+        return `
+            <div class="historico-exercicios">
+                <h3>📚 Histórico de treinos</h3>
+                <p class="sem-dados">
+                    Nenhum registro anterior encontrado.
+                </p>
+            </div>
+        `;
+    }
+
+    let html = `
+        <div class="historico-exercicios">
+            <h3>📚 Histórico de treinos</h3>
+    `;
+
+    historico.sessoes.forEach((sessao, indice) => {
+
+        html += `
+            <div class="sessao-historico">
+                <div class="data-historico">
+                    📅 ${escaparHTML(formatarData(sessao.data_treino))}
+                </div>
+        `;
+
+        if (exercicio.tipo === "cardio") {
+
+            const serie = sessao.series?.[0];
+
+            if (serie) {
+                html += `
+                    <div class="linha-ultimo">
+                        <span>Cardio</span>
+                        <strong>
+                            ${escaparHTML(serie.valor_tempo)} minutos
+                        </strong>
+                    </div>
+                `;
+            }
+
+        } else {
+
+            (sessao.series || []).forEach((serie, i) => {
+
+                html += `
+                    <div class="linha-ultimo">
+                        <span>Série ${i + 1}</span>
+                        <strong>
+                            ${exercicio.tipo === "tempo"
+                        ? `${escaparHTML(serie.valor_tempo)} segundos`
+                        : `${escaparHTML(serie.carga)} kg × ${escaparHTML(serie.repeticoes)} reps`
+                    }
+                        </strong>
+                    </div>
+                `;
+
+            });
+
+        }
+
+        html += `</div>`;
+
+    });
+
+    html += `</div>`;
+
+    return html;
+}
+
 
 
 // ==========================================
@@ -515,7 +606,8 @@ async function abrirExercicio(index) {
 function mostrarExercicio(
     exercicio,
     index,
-    dados
+    dados,
+    historico
 ) {
 
     tituloTreino.textContent =
@@ -726,6 +818,16 @@ function mostrarExercicio(
         </div>
 
     `;
+
+
+    // ======================================
+    // HISTÓRICO DE TREINOS
+    // ======================================
+
+    html += montarHistoricoHTML(
+        exercicio,
+        historico
+    );
 
 
     // ======================================
@@ -976,15 +1078,8 @@ async function salvarExercicio(
 
         let dadosEnviar = {
 
-            treino:
-                treinoAtual.nome,
-
-            exercicio:
-                exercicio.nome,
-
-            tipo:
-                exercicio.tipo ||
-                "normal"
+            exercicioId:
+                exercicio.id
 
         };
 
@@ -1029,10 +1124,6 @@ async function salvarExercicio(
 
             }
 
-
-            // IMPORTANTE:
-            // O server.js espera "valor"
-            // diretamente no objeto.
 
             dadosEnviar.valor =
                 valor;
@@ -1094,10 +1185,6 @@ async function salvarExercicio(
 
                 }
 
-
-                // IMPORTANTE:
-                // O server.js espera "valor"
-                // e não "valor_tempo".
 
                 series.push({
 
@@ -1219,7 +1306,7 @@ async function salvarExercicio(
         const resposta =
             await fetch(
 
-                `${API_URL}/treinos`,
+                `${API_URL}/me/execucoes`,
 
                 {
 
