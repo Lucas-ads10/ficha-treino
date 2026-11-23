@@ -291,8 +291,12 @@ function editarUsuario() {
     document.getElementById("mensalidadeUsuario").value =
         usuarioSelecionado.mensalidade || "";
 
-    document.getElementById("dataPrimeiroPagamento").value =
-        usuarioSelecionado.dataUltimoPagamento || "";
+    const campoDataPrimeiroPagamento =
+        document.getElementById("dataPrimeiroPagamento");
+
+    campoDataPrimeiroPagamento.value = "";
+    campoDataPrimeiroPagamento.required = false;
+    campoDataPrimeiroPagamento.disabled = true;
 
     document.getElementById("modalUsuario").hidden = false;
 
@@ -442,10 +446,19 @@ function visualizarTreino(id) {
 
 function cadastrarUsuario() {
 
+    usuarioEmEdicao = null;
+    usuarioSelecionado = null;
+
     document.getElementById("tituloModalUsuario").textContent =
         "Adicionar usuário";
 
     document.getElementById("formUsuario").reset();
+
+    const campoDataPrimeiroPagamento =
+        document.getElementById("dataPrimeiroPagamento");
+
+    campoDataPrimeiroPagamento.disabled = false;
+    campoDataPrimeiroPagamento.required = true;
 
     document.getElementById("modalUsuario").hidden = false;
 
@@ -748,6 +761,7 @@ function atualizarGraficoPagamentos(emDia, atrasados) {
 // ==========================================
 
 const API_URL = window.CAVERNA_CONFIG.API_URL;
+let csrfToken = null;
 
 async function carregarAlunos() {
 
@@ -802,6 +816,12 @@ async function iniciarPainelAdmin() {
         }
 
         const dados = await resposta.json();
+
+        csrfToken = dados.csrfToken;
+
+        if (!csrfToken) {
+            throw new Error("Token de segurança da sessão não encontrado.");
+        }
 
         if (!dados.sucesso || !dados.usuario) {
             window.location.replace("../login/");
@@ -1188,11 +1208,14 @@ document.getElementById("btnCancelarExercicio").addEventListener(
 // SALVAR NOVO USUÁRIO
 // ==========================================
 
+
 document.getElementById("formUsuario").addEventListener(
     "submit",
-    function (event) {
-
+    async function (event) {
         event.preventDefault();
+
+        const formulario = this;
+        const botaoSalvar = formulario.querySelector('button[type="submit"]');
 
         const nome = normalizarNome(
             document.getElementById("nomeUsuario").value
@@ -1206,10 +1229,16 @@ document.getElementById("formUsuario").addEventListener(
             document.getElementById("mensalidadeUsuario").value
         );
 
-        const peso = Number
-            (document.getElementById("pesoUsuario").value);
-        const idade = Number(document.getElementById("idadeUsuario").value);
+        const peso = Number(
+            document.getElementById("pesoUsuario").value
+        );
+
+        const idade = Number(
+            document.getElementById("idadeUsuario").value
+        );
+
         const objetivo = document.getElementById("objetivoUsuario").value;
+
         const observacoes = document.getElementById("observacoesUsuario").value.trim();
 
         const dataPrimeiroPagamento =
@@ -1226,7 +1255,7 @@ document.getElementById("formUsuario").addEventListener(
             !objetivo ||
             !mensalidade ||
             mensalidade <= 0 ||
-            !dataPrimeiroPagamento
+            (usuarioEmEdicao === null && !dataPrimeiroPagamento)
         ) {
             alert("Preencha todos os campos corretamente.");
             return;
@@ -1243,64 +1272,97 @@ document.getElementById("formUsuario").addEventListener(
             return;
         }
 
-        if (usuarioEmEdicao !== null) {
-
-            const usuario = usuarios.find(
-                usuario => usuario.id === usuarioEmEdicao
-            );
-
-            if (!usuario) return;
-
-            usuario.nome = nome;
-            usuario.email = email;
-            usuario.peso = peso;
-            usuario.idade = idade;
-            usuario.objetivo = objetivo;
-            usuario.observacoes = observacoes;
-            usuario.mensalidade = mensalidade;
-
-        } else {
-
-            usuarios.push({
-                id: Date.now(),
-                nome: nome,
-                email: email,
-                peso: peso,
-                idade: idade,
-                objetivo: objetivo,
-                observacoes: observacoes,
-                status: "Pendente",
-                mensalidade: mensalidade,
-                dataUltimoPagamento: dataPrimeiroPagamento,
-                historicoPagamentos: [
-                    {
-                        valor: mensalidade,
-                        data: dataPrimeiroPagamento
-                    }
-                ],
-                treinos: []
-            });
-
+        if (!csrfToken) {
+            alert("Sessão de segurança inválida. Entre novamente.");
+            return;
         }
-
-        document.getElementById("modalUsuario").hidden = true;
-
-        document.getElementById("formUsuario").reset();
 
         const estavaEditando = usuarioEmEdicao !== null;
 
-        usuarioEmEdicao = null;
+        const dadosAluno = {
+            nome,
+            email,
+            peso,
+            idade,
+            objetivo,
+            observacoes,
+            mensalidade
+        };
 
-        atualizarPainel();
+        if (!estavaEditando) {
+            dadosAluno.dataPrimeiroPagamento = dataPrimeiroPagamento;
+        }
 
-        if (estavaEditando) {
-            visualizarUsuario(usuarioSelecionado.id);
-            alert("Usuário atualizado com sucesso!");
-        } else {
-            alert("Usuário cadastrado com sucesso!");
+        botaoSalvar.disabled = true;
+
+        try {
+            const url = estavaEditando
+                ? `${API_URL}/alunos/${usuarioEmEdicao}`
+                : `${API_URL}/alunos`;
+
+            const resposta = await fetch(url, {
+                method: estavaEditando ? "PATCH" : "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken
+                },
+                body: JSON.stringify(dadosAluno)
+            });
+
+            const dados = await resposta.json();
+
+            if (!resposta.ok || !dados.sucesso) {
+                throw new Error(
+                    dados.message ||
+                    dados.mensagem ||
+                    "Não foi possível salvar o aluno."
+                );
+            }
+
+            const alunosCarregados = await carregarAlunos();
+
+            if (!alunosCarregados) {
+                throw new Error(
+                    "O aluno foi salvo, mas não foi possível atualizar a listagem. Atualize a página."
+                );
+            }
+
+            document.getElementById("modalUsuario").hidden = true;
+            formulario.reset();
+
+            usuarioEmEdicao = null;
+
+            atualizarPainel();
+
+            if (estavaEditando) {
+                const alunoAtualizado = usuarios.find(
+                    usuario => usuario.id === dados.aluno.id
+                );
+
+                if (alunoAtualizado) {
+                    visualizarUsuario(alunoAtualizado.id);
+                }
+
+                alert("Aluno atualizado com sucesso!");
+            } else {
+                alert(
+                    dados.conviteEnviado
+                        ? "Aluno cadastrado e convite enviado por e-mail!"
+                        : "Aluno cadastrado! O convite por e-mail não foi enviado."
+                );
+            }
+
+        } catch (erro) {
+            console.error("Erro ao salvar aluno:", erro);
+            alert(erro.message || "Erro ao salvar aluno.");
+
+        } finally {
+            botaoSalvar.disabled = false;
         }
     }
 );
+
 
 // ==========================================
 // CANCELAR CADASTRO DE USUÁRIO
