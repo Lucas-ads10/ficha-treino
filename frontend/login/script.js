@@ -39,6 +39,13 @@ mostrarSenha.addEventListener("change", function () {
 const formLogin = document.getElementById("formLogin");
 const mensagemLogin = document.getElementById("mensagemLogin");
 
+// CONTROLE DO PRIMEIRO ACESSO
+
+let csrfTokenSessao = null;
+let senhaAtualTemporaria = null;
+let tokenConvite = null;
+let modoNovaSenha = null;
+
 formLogin.addEventListener("submit", async function (event) {
 
     event.preventDefault();
@@ -82,6 +89,29 @@ formLogin.addEventListener("submit", async function (event) {
         if (!resposta.ok || !dados.sucesso) {
             throw new Error(dados.message || dados.mensagem || "E-mail ou senha inválidos.");
         }
+
+        // PRIMEIRO ACESSO: SENHA TEMPORÁRIA
+
+        if (dados.usuario?.deveTrocarSenha) {
+
+            csrfTokenSessao = dados.csrfToken;
+            senhaAtualTemporaria = senha;
+            modoNovaSenha = "TEMPORARIA";
+
+            formLogin.hidden = true;
+            recuperacaoSenha.hidden = true;
+            novaSenha.hidden = false;
+            tituloLogin.hidden = true;
+
+            formNovaSenha.reset();
+            mensagemNovaSenha.style.color = "#4caf50";
+            mensagemNovaSenha.textContent =
+                "Primeiro acesso identificado. Crie sua senha definitiva.";
+
+            return;
+        }
+
+        // LOGIN NORMAL
 
         const destinosPermitidos = ["/admin/", "/ficha/"];
 
@@ -145,17 +175,9 @@ voltarLogin.addEventListener("click", function (event) {
 
 });
 
-// NAVEGAÇÃO PARA NOVA SENHA
+// NOVA SENHA
 
-const abrirNovaSenha = document.getElementById("abrirNovaSenha");
 const novaSenha = document.getElementById("novaSenha");
-
-abrirNovaSenha.addEventListener("click", function () {
-
-    recuperacaoSenha.hidden = true;
-    novaSenha.hidden = false;
-
-});
 
 // VALIDAÇÃO DO FORMULÁRIO DE RECUPERAÇÃO
 
@@ -188,12 +210,12 @@ formRecuperacao.addEventListener("submit", function (event) {
 
 });
 
-// VALIDAÇÃO DO FORMULÁRIO DE NOVA SENHA
+// DEFINIÇÃO REAL DE NOVA SENHA
 
 const formNovaSenha = document.getElementById("formNovaSenha");
 const mensagemNovaSenha = document.getElementById("mensagemNovaSenha");
 
-formNovaSenha.addEventListener("submit", function (event) {
+formNovaSenha.addEventListener("submit", async function (event) {
 
     event.preventDefault();
 
@@ -208,8 +230,9 @@ formNovaSenha.addEventListener("submit", function (event) {
         return;
     }
 
-    if (senha.length < 8) {
-        mensagemNovaSenha.textContent = "A senha deve ter pelo menos 8 caracteres.";
+    if (senha.length < 8 || senha.length > 128) {
+        mensagemNovaSenha.textContent =
+            "A senha deve ter entre 8 e 128 caracteres.";
         return;
     }
 
@@ -218,21 +241,107 @@ formNovaSenha.addEventListener("submit", function (event) {
         return;
     }
 
-    mensagemNovaSenha.style.color = "#4caf50";
-    mensagemNovaSenha.textContent = "Senha alterada com sucesso!";
+    if (!modoNovaSenha) {
+        mensagemNovaSenha.textContent =
+            "Não foi possível identificar o tipo de acesso. Abra novamente o link ou faça login.";
+        return;
+    }
 
-    setTimeout(function () {
+    const botaoSalvar = formNovaSenha.querySelector(
+        'button[type="submit"]'
+    );
+
+    botaoSalvar.disabled = true;
+    botaoSalvar.textContent = "Salvando...";
+
+    try {
+
+        let url;
+        let corpo;
+        const cabecalhos = {
+            "Content-Type": "application/json"
+        };
+
+        if (modoNovaSenha === "TEMPORARIA") {
+
+            url = `${API_URL}/auth/alterar-senha`;
+
+            cabecalhos["X-CSRF-Token"] = csrfTokenSessao;
+
+            corpo = {
+                senhaAtual: senhaAtualTemporaria,
+                novaSenha: senha
+            };
+
+        } else if (modoNovaSenha === "CONVITE") {
+
+            url = `${API_URL}/auth/convite/aceitar`;
+
+            corpo = {
+                token: tokenConvite,
+                novaSenha: senha
+            };
+
+        } else {
+            throw new Error("Método de acesso inválido.");
+        }
+
+        const resposta = await fetch(url, {
+            method: "POST",
+            credentials: "include",
+            headers: cabecalhos,
+            body: JSON.stringify(corpo)
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.sucesso) {
+            throw new Error(
+                dados.message ||
+                dados.mensagem ||
+                "Não foi possível alterar a senha."
+            );
+        }
+
+        // Limpa os dados temporários.
+        csrfTokenSessao = null;
+        senhaAtualTemporaria = null;
+        tokenConvite = null;
+        modoNovaSenha = null;
+
+        // Remove o token do convite da URL.
+        window.history.replaceState(
+            null,
+            "",
+            window.location.pathname + window.location.search
+        );
 
         novaSenha.hidden = true;
+        recuperacaoSenha.hidden = true;
         formLogin.hidden = false;
         tituloLogin.hidden = false;
 
         formNovaSenha.reset();
         mensagemNovaSenha.textContent = "";
-        mensagemLogin.style.color = "#4caf50";
-        mensagemLogin.textContent = "Senha alterada com sucesso!";
 
-    }, 1500);
+        mensagemLogin.style.color = "#4caf50";
+        mensagemLogin.textContent =
+            "Senha criada com sucesso! Entre com sua nova senha.";
+
+    } catch (erro) {
+
+        mensagemNovaSenha.style.color = "#e57373";
+        mensagemNovaSenha.textContent =
+            erro.message === "Failed to fetch"
+                ? "Não foi possível conectar ao servidor."
+                : erro.message;
+
+    } finally {
+
+        botaoSalvar.disabled = false;
+        botaoSalvar.textContent = "Salvar nova senha";
+
+    }
 
 });
 
@@ -250,3 +359,33 @@ mostrarNovaSenha.addEventListener("change", function () {
     campoConfirmarSenha.type = tipo;
 
 });
+
+// RECONHECER CONVITE RECEBIDO POR E-MAIL
+
+const hash = window.location.hash;
+
+if (hash.startsWith("#convite=")) {
+
+    tokenConvite = hash.substring("#convite=".length);
+    modoNovaSenha = "CONVITE";
+
+    if (tokenConvite) {
+
+        formLogin.hidden = true;
+        recuperacaoSenha.hidden = true;
+        novaSenha.hidden = false;
+        tituloLogin.hidden = true;
+
+        mensagemNovaSenha.style.color = "#4caf50";
+        mensagemNovaSenha.textContent =
+            "Convite identificado! Crie sua senha para acessar sua conta.";
+
+    } else {
+
+        modoNovaSenha = null;
+
+        mensagemLogin.style.color = "#e57373";
+        mensagemLogin.textContent = "Link de convite inválido.";
+
+    }
+}

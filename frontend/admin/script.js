@@ -267,6 +267,8 @@ function editarUsuario() {
 
     usuarioEmEdicao = usuarioSelecionado.id;
 
+    document.getElementById("campoMetodoAcesso").hidden = true;
+
     document.getElementById("tituloModalUsuario").textContent =
         "Editar usuário";
 
@@ -453,6 +455,9 @@ function cadastrarUsuario() {
         "Adicionar usuário";
 
     document.getElementById("formUsuario").reset();
+
+    document.getElementById("campoMetodoAcesso").hidden = false;
+    document.getElementById("metodoAcesso").value = "CONVITE";
 
     const campoDataPrimeiroPagamento =
         document.getElementById("dataPrimeiroPagamento");
@@ -1291,6 +1296,8 @@ document.getElementById("formUsuario").addEventListener(
 
         if (!estavaEditando) {
             dadosAluno.dataPrimeiroPagamento = dataPrimeiroPagamento;
+            dadosAluno.metodoAcesso =
+                document.getElementById("metodoAcesso").value;
         }
 
         botaoSalvar.disabled = true;
@@ -1345,11 +1352,27 @@ document.getElementById("formUsuario").addEventListener(
                 }
 
                 alert("Aluno atualizado com sucesso!");
+            } else if (dados.senhaTemporaria) {
+                // Copia automaticamente a senha para facilitar a entrega ao aluno.
+                try {
+                    await navigator.clipboard.writeText(dados.senhaTemporaria);
+
+                    alert(
+                        "Aluno cadastrado!\n\n" +
+                        "Senha temporária: " + dados.senhaTemporaria +
+                        "\n\nA senha foi copiada. Entregue-a ao aluno para o primeiro acesso."
+                    );
+                } catch {
+                    window.prompt(
+                        "Aluno cadastrado! Copie a senha temporária abaixo:",
+                        dados.senhaTemporaria
+                    );
+                }
             } else {
                 alert(
                     dados.conviteEnviado
                         ? "Aluno cadastrado e convite enviado por e-mail!"
-                        : "Aluno cadastrado! O convite por e-mail não foi enviado."
+                        : "Aluno cadastrado, mas o convite não foi enviado. Será necessário reenviar o convite ou gerar uma senha temporária."
                 );
             }
 

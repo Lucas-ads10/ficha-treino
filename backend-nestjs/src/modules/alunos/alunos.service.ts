@@ -107,7 +107,7 @@ export class AlunosService {
     private readonly usuarios: UsuariosService,
     private readonly senhas: SenhaService,
     private readonly mail: MailService,
-  ) {}
+  ) { }
 
   async listar(busca?: string) {
     const termo = busca?.trim();
@@ -118,11 +118,11 @@ export class AlunosService {
           excluidoEm: null,
           ...(termo
             ? {
-                OR: [
-                  { nome: { contains: termo } },
-                  { email: { contains: termo } },
-                ],
-              }
+              OR: [
+                { nome: { contains: termo } },
+                { email: { contains: termo } },
+              ],
+            }
             : {}),
         },
       },
@@ -146,6 +146,17 @@ export class AlunosService {
     const email = normalizarEmail(dto.email);
     await this.garantirEmailLivre(email);
 
+    // Gera senha somente quando essa foi a opção escolhida.
+    const senhaTemporaria =
+      dto.metodoAcesso === 'SENHA_TEMPORARIA'
+        ? gerarSenhaTemporaria()
+        : null;
+
+    // Somente o hash será armazenado no banco.
+    const senhaHash = senhaTemporaria
+      ? await this.senhas.gerarHash(senhaTemporaria)
+      : null;
+
     let alunoId: number;
 
     try {
@@ -157,6 +168,8 @@ export class AlunosService {
             email,
             perfil: 'ALUNO',
             status: 'PENDENTE',
+            senhaHash,
+            deveTrocarSenha: senhaTemporaria !== null,
           },
         });
 
@@ -172,7 +185,6 @@ export class AlunosService {
           },
         });
 
-
         return aluno.id;
       });
     } catch (erro) {
@@ -180,19 +192,27 @@ export class AlunosService {
       throw erro;
     }
 
-    // Convite por e-mail (se a configuração de e-mail existir). Falha de envio
-    // não desfaz o cadastro: o administrador pode reenviar ou gerar senha temporária.
     const aluno = await this.buscarCompleto(alunoId);
-    const conviteEnviado = await this.enviarConviteInterno(
-      aluno.usuario.id,
-      aluno.usuario.email,
-      aluno.usuario.nome,
-    );
 
-    return { aluno: paraVisaoAdmin(aluno), conviteEnviado };
+    // Só envia convite quando essa opção foi selecionada.
+    let conviteEnviado = false;
+
+    if (dto.metodoAcesso === 'CONVITE') {
+      conviteEnviado = await this.enviarConviteInterno(
+        aluno.usuario.id,
+        aluno.usuario.email,
+        aluno.usuario.nome,
+      );
+    }
+
+    return {
+      aluno: paraVisaoAdmin(aluno),
+      conviteEnviado,
+      senhaTemporaria,
+    };
   }
 
-  
+
   async atualizar(id: number, dto: AtualizarAlunoDto) {
     const aluno = await this.buscarCompleto(id);
     const email = normalizarEmail(dto.email);

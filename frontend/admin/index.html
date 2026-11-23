@@ -516,6 +516,17 @@
                             <input type="date" id="dataPrimeiroPagamento" required>
                         </div>
 
+                        <div class="campo-formulario" id="campoMetodoAcesso">
+                            <label for="metodoAcesso">Forma de acesso do aluno</label>
+                            <select id="metodoAcesso" required>
+                                <option value="CONVITE">Enviar convite por e-mail</option>
+                                <option value="SENHA_TEMPORARIA">Gerar senha temporária</option>
+                            </select>
+                            <small>
+                                Nos dois casos, o aluno deverá criar uma nova senha no primeiro acesso.
+                            </small>
+                        </div>
+
                         <div class="botoes-formulario">
                             <button type="button" id="btnCancelarUsuario">
                                 Cancelar

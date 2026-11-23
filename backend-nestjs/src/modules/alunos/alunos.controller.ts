@@ -23,7 +23,7 @@ import { AlunosService } from './alunos.service.js';
 @Perfis('ADMIN')
 @Controller('alunos')
 export class AlunosController {
-  constructor(private readonly alunos: AlunosService) {}
+  constructor(private readonly alunos: AlunosService) { }
 
   @Get()
   async listar(@Query('busca') busca?: string) {
@@ -40,8 +40,15 @@ export class AlunosController {
     @Body() dto: CriarAlunoDto,
     @UsuarioAtual() admin: UsuarioAutenticado,
   ) {
-    const { aluno, conviteEnviado } = await this.alunos.criar(dto, admin.id);
-    return { sucesso: true, aluno, conviteEnviado };
+    const { aluno, conviteEnviado, senhaTemporaria } =
+      await this.alunos.criar(dto, admin.id);
+
+    return {
+      sucesso: true,
+      aluno,
+      conviteEnviado,
+      senhaTemporaria,
+    };
   }
 
   @Patch(':id')

@@ -67,4 +67,9 @@ export class CriarAlunoDto extends AtualizarAlunoDto {
     message: 'Informe a data do primeiro vencimento.',
   })
   dataPrimeiroPagamento!: string;
+
+  @IsIn(['CONVITE', 'SENHA_TEMPORARIA'], {
+    message: 'Selecione uma forma de acesso válida.',
+  })
+  metodoAcesso!: 'CONVITE' | 'SENHA_TEMPORARIA';
 }
