@@ -3,74 +3,7 @@
 // DADOS DE DEMONSTRAÇÃO
 // ==========================================
 
-const usuarios = [
-    {
-        id: 1,
-        nome: "Lucas Silva",
-        email: "lucas@email.com",
-        status: "Ativo",
-        treinos: [
-            {
-                id: 1,
-                nome: "Treino A",
-                exercicios: []
-            },
-            {
-                id: 2,
-                nome: "Treino B",
-                exercicios: []
-            },
-            {
-                id: 3,
-                nome: "Treino C",
-                exercicios: []
-            },
-            {
-                id: 4,
-                nome: "Treino D",
-                exercicios: []
-            }
-        ]
-    },
-    {
-        id: 2,
-        nome: "João Santos",
-        email: "joao@email.com",
-        status: "Ativo",
-        treinos: [
-            {
-                id: 5,
-                nome: "Treino A",
-                exercicios: []
-            },
-            {
-                id: 6,
-                nome: "Treino B",
-                exercicios: []
-            }
-        ]
-    },
-    {
-        id: 3,
-        nome: "Maria Oliveira",
-        email: "maria@email.com",
-        status: "Pendente",
-        treinos: []
-    },
-    {
-        id: 4,
-        nome: "Pedro Costa",
-        email: "pedro@email.com",
-        status: "Ativo",
-        treinos: [
-            {
-                id: 7,
-                nome: "Treino de pernas",
-                exercicios: []
-            }
-        ]
-    }
-];
+let usuarios = [];
 
 let usuarioSelecionado = null;
 let usuarioEmEdicao = null;
@@ -816,6 +749,42 @@ function atualizarGraficoPagamentos(emDia, atrasados) {
 
 const API_URL = window.CAVERNA_CONFIG.API_URL;
 
+async function carregarAlunos() {
+
+    try {
+
+        const resposta = await fetch(`${API_URL}/alunos`, {
+            method: "GET",
+            credentials: "include"
+        });
+
+        if (!resposta.ok) {
+            throw new Error(`Erro ao carregar alunos: ${resposta.status}`);
+        }
+
+        const dados = await resposta.json();
+
+        if (!dados.sucesso || !Array.isArray(dados.alunos)) {
+            throw new Error("Resposta inválida da API de alunos.");
+        }
+
+        usuarios = dados.alunos;
+
+        return true;
+
+    } catch (erro) {
+
+        console.error("Erro ao carregar alunos:", erro);
+
+        alert("Não foi possível carregar os alunos. Atualize a página ou tente novamente.");
+
+        return false;
+
+    }
+
+}
+
+
 async function iniciarPainelAdmin() {
 
     const painel = document.getElementById("painelAdmin");
@@ -846,6 +815,12 @@ async function iniciarPainelAdmin() {
 
         if (dados.usuario.deveTrocarSenha) {
             window.location.replace("../login/");
+            return;
+        }
+
+        const alunosCarregados = await carregarAlunos();
+
+        if (!alunosCarregados) {
             return;
         }
 
