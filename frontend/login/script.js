@@ -1,3 +1,7 @@
+// CONFIGURAÇÃO DA API
+
+const API_URL = window.CAVERNA_CONFIG.API_URL;
+
 
 const botaoTema = document.getElementById("alternarTema");
 
@@ -29,18 +33,20 @@ mostrarSenha.addEventListener("change", function () {
 });
 
 
-// VALIDAÇÃO DO FORMULÁRIO DE LOGIN
+
+// AUTENTICAÇÃO REAL DO USUÁRIO
 
 const formLogin = document.getElementById("formLogin");
 const mensagemLogin = document.getElementById("mensagemLogin");
 
-formLogin.addEventListener("submit", function (event) {
+formLogin.addEventListener("submit", async function (event) {
 
     event.preventDefault();
 
     const email = document.getElementById("email").value.trim();
-    const senha = campoSenha.value.trim();
+    const senha = campoSenha.value;
 
+    mensagemLogin.style.color = "#e57373";
     mensagemLogin.textContent = "";
 
     if (!email || !senha) {
@@ -55,10 +61,57 @@ formLogin.addEventListener("submit", function (event) {
         return;
     }
 
-    mensagemLogin.style.color = "#4caf50";
-    mensagemLogin.textContent = "Dados preenchidos corretamente!";
+    const botaoEntrar = formLogin.querySelector('button[type="submit"]');
+
+    botaoEntrar.disabled = true;
+    botaoEntrar.textContent = "Entrando...";
+
+    try {
+
+        const resposta = await fetch(`${API_URL}/auth/login`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, senha })
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.sucesso) {
+            throw new Error(dados.message || dados.mensagem || "E-mail ou senha inválidos.");
+        }
+
+        const destinosPermitidos = ["/admin/", "/ficha/"];
+
+        if (!destinosPermitidos.includes(dados.destino)) {
+            throw new Error("Destino de acesso inválido.");
+        }
+
+        mensagemLogin.style.color = "#4caf50";
+        mensagemLogin.textContent = "Login realizado! Redirecionando...";
+
+        window.location.href = dados.destino;
+
+    } catch (erro) {
+
+        mensagemLogin.style.color = "#e57373";
+
+        mensagemLogin.textContent =
+            erro.message === "Failed to fetch"
+                ? "Não foi possível conectar ao servidor. Tente novamente."
+                : erro.message;
+
+    } finally {
+
+        botaoEntrar.disabled = false;
+        botaoEntrar.textContent = "Entrar";
+
+    }
 
 });
+
 
 
 // NAVEGAÇÃO PARA RECUPERAÇÃO DE SENHA

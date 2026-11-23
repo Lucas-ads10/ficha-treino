@@ -19,15 +19,18 @@ import { Module } from '@nestjs/common';
 import { createInterface } from 'node:readline';
 import { Writable } from 'node:stream';
 
-import { SenhaService } from '../common/senha.service.js';
+import { CommonModule } from '../common/common.module.js';
 import { PrismaModule } from '../prisma/prisma.module.js';
 import { UsuariosModule } from '../modules/usuarios/usuarios.module.js';
 import { UsuariosService } from '../modules/usuarios/usuarios.service.js';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, UsuariosModule],
-  providers: [SenhaService],
-  exports: [SenhaService],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    CommonModule,
+    UsuariosModule,
+  ],
 })
 class CliModule {}
 

@@ -809,13 +809,63 @@ function atualizarGraficoPagamentos(emDia, atrasados) {
 }
 
 
+
 // ==========================================
-// INICIALIZAÇÃO
+// AUTENTICAÇÃO E INICIALIZAÇÃO
 // ==========================================
 
-atualizarPainel();
+const API_URL = window.CAVERNA_CONFIG.API_URL;
 
-navegar("dashboard");
+async function iniciarPainelAdmin() {
+
+    const painel = document.getElementById("painelAdmin");
+
+    try {
+
+        const resposta = await fetch(`${API_URL}/auth/me`, {
+            method: "GET",
+            credentials: "include"
+        });
+
+        if (!resposta.ok) {
+            window.location.replace("../login/");
+            return;
+        }
+
+        const dados = await resposta.json();
+
+        if (!dados.sucesso || !dados.usuario) {
+            window.location.replace("../login/");
+            return;
+        }
+
+        if (dados.usuario.perfil !== "ADMIN") {
+            window.location.replace("../login/");
+            return;
+        }
+
+        if (dados.usuario.deveTrocarSenha) {
+            window.location.replace("../login/");
+            return;
+        }
+
+        painel.hidden = false;
+
+        atualizarPainel();
+        navegar("dashboard");
+
+    } catch (erro) {
+
+        console.error("Erro ao verificar sessão:", erro);
+
+        window.location.replace("../login/");
+
+    }
+
+}
+
+iniciarPainelAdmin();
+
 
 
 

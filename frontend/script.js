@@ -245,11 +245,7 @@ const ficha = {
 // CONFIGURAÇÃO DO BACKEND
 // ==========================================
 
-// Se estiver testando o server.js LOCALMENTE:
-// const API_URL = "http://localhost:3000";
-
-// Se estiver usando o backend publicado no Render:
-const API_URL = "https://ficha-treino-nestjs.onrender.com";
+const API_URL = window.CAVERNA_CONFIG.API_URL;
 
 
 // ==========================================
