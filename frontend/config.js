@@ -3,5 +3,5 @@
 // ==========================================
 
 window.CAVERNA_CONFIG = {
-    API_URL: "https://ficha-treino-nestjs.onrender.com"
+    API_URL: "https://api.ctcaverna.com.br"
 };
